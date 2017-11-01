@@ -1,36 +1,29 @@
-package com.sirolf2009.lajer.core.operation
+package com.sirolf2009.lajer.ide
 
 import com.sirolf2009.lajer.core.Port
 import com.sirolf2009.lajer.core.component.Component
-import com.sirolf2009.lajer.core.operation.model.Operation
+import com.sirolf2009.lajer.ide.lajer.LajerLayout
+import com.sirolf2009.lajer.ide.lajer.LajerLayout.LajerLayoutData
+import com.sirolf2009.lajer.ide.model.RenderedNode
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
+import java.util.Optional
 import java.util.Scanner
 import javax.swing.JOptionPane
-import org.junit.Test
+import org.eclipse.swt.SWT
+import org.eclipse.swt.widgets.Composite
 
-import static extension com.sirolf2009.lajer.core.operation.model.Connection.*
-
-class TestCalculator {
-
-	@Test
-	def void test() {
-		val summer = new Summer()
-		val subtractor = new Subtractor()
-		val input = new UserInput()
-		val displayer = new Displayer()
-		
-		input -> summer
-		input -> subtractor
-		summer -> displayer
-		subtractor -> displayer
-		
-		val calculator = new Operation(#[input, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
-		
-		new LajerThread(calculator.inputPorts.get(0), #[]).start()
-		Thread.sleep(10000)
+class LajerEditor extends Composite {
+	
+	new(Composite parent) {
+		super(parent, SWT.BORDER)
+		layout = new LajerLayout()
+		new RenderedNode(this, new UserInput(), Optional.empty())
+		new RenderedNode(this, new UserInput(), Optional.empty()) => [
+			layoutData = new LajerLayoutData(300, 300)
+		]
 	}
-
+	
 	// Component
 	static class Summer extends Component {
 
@@ -102,5 +95,5 @@ class TestCalculator {
 		}
 
 	}
-
+	
 }

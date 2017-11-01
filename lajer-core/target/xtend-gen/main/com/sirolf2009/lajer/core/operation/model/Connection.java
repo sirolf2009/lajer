@@ -1,5 +1,6 @@
 package com.sirolf2009.lajer.core.operation.model;
 
+import com.sirolf2009.lajer.core.Node;
 import com.sirolf2009.lajer.core.Port;
 import java.util.List;
 import org.eclipse.xtend.lib.annotations.Data;
@@ -12,6 +13,18 @@ public class Connection {
   private final Port from;
   
   private final Port to;
+  
+  public static Connection operator_mappedTo(final Node from, final Node to) {
+    return Connection.connectTo(from, to);
+  }
+  
+  public static Connection connectTo(final Node from, final Node to) {
+    return Connection.connectTo(from.getOutputPorts().get(0), to.getInputPorts().get(0));
+  }
+  
+  public static Connection operator_mappedTo(final Port from, final Port to) {
+    return Connection.connectTo(from, to);
+  }
   
   public static Connection connectTo(final Port from, final Port to) {
     final Connection connection = new Connection(from, to);

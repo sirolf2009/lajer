@@ -14,7 +14,8 @@
 
 	<modules>
 		<module>lajer-core</module>
-	</modules>
+    <module>lajer-ide</module>
+  </modules>
 
 	<build>
 		<plugins>

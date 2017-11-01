@@ -109,10 +109,10 @@ public class TestCalculator {
       final TestCalculator.Subtractor subtractor = new TestCalculator.Subtractor();
       final TestCalculator.UserInput input = new TestCalculator.UserInput();
       final TestCalculator.Displayer displayer = new TestCalculator.Displayer();
-      Connection.connectTo(input.getOutputPorts().get(0), summer.getInputPorts().get(0));
-      Connection.connectTo(input.getOutputPorts().get(0), subtractor.getInputPorts().get(0));
-      Connection.connectTo(summer.getOutputPorts().get(0), displayer.getInputPorts().get(0));
-      Connection.connectTo(subtractor.getOutputPorts().get(0), displayer.getInputPorts().get(0));
+      Connection.operator_mappedTo(input, summer);
+      Connection.operator_mappedTo(input, subtractor);
+      Connection.operator_mappedTo(summer, displayer);
+      Connection.operator_mappedTo(subtractor, displayer);
       Port _get = input.getInputPorts().get(0);
       final Operation calculator = new Operation(Collections.<Node>unmodifiableList(CollectionLiterals.<Node>newArrayList(input, summer, subtractor, displayer)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_get)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList()));
       Port _get_1 = calculator.getInputPorts().get(0);
