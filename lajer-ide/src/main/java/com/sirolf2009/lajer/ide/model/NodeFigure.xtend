@@ -12,10 +12,12 @@ import com.sirolf2009.lajer.ide.lajer.LajerManager
 
 @Data class NodeFigure extends Figure {
 	
+	val Node node
 	val List<InputFigure> inputFigures
 	val List<OutputFigure> outputFigures
 
 	new(LajerManager manager, Node node, Label name) {
+		this.node = node
 		layoutManager = new ToolbarLayout() => [
 			minorAlignment = ToolbarLayout.ALIGN_TOPLEFT
 			horizontal = true
@@ -26,7 +28,7 @@ import com.sirolf2009.lajer.ide.lajer.LajerManager
 		add(new Figure() => [
 			layoutManager = new ToolbarLayout()
 			node.inputPorts.forEach[
-				add(new InputFigure(it, manager) => [
+				add(new InputFigure(this, it, manager) => [
 					inputFigures.add(it)
 				])
 			]
@@ -38,7 +40,7 @@ import com.sirolf2009.lajer.ide.lajer.LajerManager
 		add(new Figure() => [
 			layoutManager = new ToolbarLayout()
 			node.outputPorts.forEach[
-				add(new OutputFigure(it, manager) => [
+				add(new OutputFigure(this, it, manager) => [
 					outputFigures.add(it)
 				])
 			]

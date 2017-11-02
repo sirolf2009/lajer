@@ -10,8 +10,8 @@ import com.sirolf2009.lajer.ide.lajer.LajerManager
 
 class OutputFigure extends PortFigure {
 
-	new(Port port, LajerManager manager) {
-		super(port, manager)
+	new(NodeFigure node, Port port, LajerManager manager) {
+		super(node, port, manager)
 		setBorder(new OutputFigureBorder(this))
 	}
 

@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Pure;
@@ -14,7 +15,8 @@ import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 @Data
 @SuppressWarnings("all")
 public class Port implements Function<List<Object>, Object> {
-  private final Component component;
+  @Accessors
+  private final transient Component component;
   
   private final MethodHandle handle;
   
@@ -42,7 +44,6 @@ public class Port implements Function<List<Object>, Object> {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((this.component== null) ? 0 : this.component.hashCode());
     result = prime * result + ((this.handle== null) ? 0 : this.handle.hashCode());
     result = prime * result + ((this.incomingConnections== null) ? 0 : this.incomingConnections.hashCode());
     result = prime * result + ((this.outgoingConnections== null) ? 0 : this.outgoingConnections.hashCode());
@@ -59,11 +60,6 @@ public class Port implements Function<List<Object>, Object> {
     if (getClass() != obj.getClass())
       return false;
     Port other = (Port) obj;
-    if (this.component == null) {
-      if (other.component != null)
-        return false;
-    } else if (!this.component.equals(other.component))
-      return false;
     if (this.handle == null) {
       if (other.handle != null)
         return false;
@@ -86,16 +82,10 @@ public class Port implements Function<List<Object>, Object> {
   @Pure
   public String toString() {
     ToStringBuilder b = new ToStringBuilder(this);
-    b.add("component", this.component);
     b.add("handle", this.handle);
     b.add("incomingConnections", this.incomingConnections);
     b.add("outgoingConnections", this.outgoingConnections);
     return b.toString();
-  }
-  
-  @Pure
-  public Component getComponent() {
-    return this.component;
   }
   
   @Pure
@@ -111,5 +101,10 @@ public class Port implements Function<List<Object>, Object> {
   @Pure
   public List<Connection> getOutgoingConnections() {
     return this.outgoingConnections;
+  }
+  
+  @Pure
+  public Component getComponent() {
+    return this.component;
   }
 }
