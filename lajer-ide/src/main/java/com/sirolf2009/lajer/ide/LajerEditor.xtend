@@ -2,7 +2,6 @@ package com.sirolf2009.lajer.ide
 
 import com.sirolf2009.lajer.core.Port
 import com.sirolf2009.lajer.core.component.Component
-import com.sirolf2009.lajer.ide.lajer.LajerLayout
 import com.sirolf2009.lajer.ide.lajer.LajerLayout.LajerLayoutData
 import com.sirolf2009.lajer.ide.model.RenderedNode
 import java.lang.invoke.MethodHandles
@@ -17,11 +16,12 @@ class LajerEditor extends Composite {
 	
 	new(Composite parent) {
 		super(parent, SWT.BORDER)
-		layout = new LajerLayout()
+//		layout = new LajerLayout()
 		new RenderedNode(this, new UserInput(), Optional.empty())
 		new RenderedNode(this, new UserInput(), Optional.empty()) => [
 			layoutData = new LajerLayoutData(300, 300)
 		]
+		setSize(500, 500)
 	}
 	
 	// Component

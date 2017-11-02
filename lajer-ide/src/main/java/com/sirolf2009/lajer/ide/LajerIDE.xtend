@@ -1,13 +1,25 @@
 package com.sirolf2009.lajer.ide
 
+import com.sirolf2009.lajer.ide.LajerEditor.Summer
+import org.eclipse.draw2d.Figure
+import org.eclipse.draw2d.Label
+import org.eclipse.draw2d.LightweightSystem
+import org.eclipse.draw2d.XYLayout
+import org.eclipse.draw2d.geometry.Rectangle
 import org.eclipse.swt.SWT
+import org.eclipse.swt.events.KeyEvent
+import org.eclipse.swt.events.KeyListener
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
+import org.eclipse.swt.widgets.Canvas
 import org.eclipse.swt.widgets.DirectoryDialog
 import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Menu
 import org.eclipse.swt.widgets.MenuItem
 import org.eclipse.swt.widgets.Shell
+import com.sirolf2009.lajer.ide.lajer.LajerManager
+import com.sirolf2009.lajer.ide.model.NodeFigure
+import com.sirolf2009.lajer.ide.LajerEditor.Subtractor
 
 class LajerIDE {
 
@@ -37,11 +49,26 @@ class LajerIDE {
 				]
 			]
 		]
-		
-		new LajerEditor(shell) => [
+
+//		new LajerEditor(shell) => [
+//			layoutData = new GridData(SWT.FILL, SWT.FILL, true, true)
+//		]
+		new Canvas(shell, SWT.BORDER) => [
 			layoutData = new GridData(SWT.FILL, SWT.FILL, true, true)
+			
+			val lws = new LightweightSystem(it)
+			val contents = new Figure()
+			val contentsLayout = new XYLayout()
+			contents.setLayoutManager(contentsLayout)
+			
+			val manager = new LajerManager(it, contentsLayout, contents)
+			addKeyListener(manager)
+			manager.add(new Summer())
+			manager.add(new Subtractor())
+			
+			lws.contents = contents
 		]
-		
+
 		shell.maximized = true
 		shell.open()
 		while(!shell.isDisposed()) {

@@ -3,22 +3,25 @@ package com.sirolf2009.lajer.ide.model
 import com.sirolf2009.lajer.core.Node
 import java.util.Optional
 import org.eclipse.swt.SWT
-import org.eclipse.swt.dnd.DND
-import org.eclipse.swt.dnd.DragSource
 import org.eclipse.swt.graphics.Image
 import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.layout.RowData
 import org.eclipse.swt.layout.RowLayout
 import org.eclipse.swt.widgets.Canvas
 import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.graphics.Point
+import org.eclipse.swt.widgets.Listener
+import org.eclipse.swt.widgets.Event
+import org.eclipse.swt.events.MouseListener
+import org.eclipse.swt.events.MouseEvent
 
-class RenderedNode extends Composite {
+class RenderedNode extends Composite implements Listener {
 
 	val Node node
 	val Optional<Image> icon
 
 	new(Composite parent, Node node, Optional<Image> icon) {
-		super(parent, SWT.BORDER)
+		super(parent, SWT.NONE)
 		this.node = node
 		this.icon = icon
 		layout = new RowLayout(SWT.HORIZONTAL) => [
@@ -46,11 +49,30 @@ class RenderedNode extends Composite {
 			layoutData = new RowData(6, 50)
 		]
 		setSize(6+50+6, 50)
-		
-		new DragSource(this, DND.DROP_MOVE)
-		addDragDetectListener[
-			println("dragging")
-		]
+		addListener(SWT.MouseDown, this)
+		addMouseListener(new MouseListener() {
+			
+			override mouseDoubleClick(MouseEvent e) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+			
+			override mouseDown(MouseEvent e) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+			
+			override mouseUp(MouseEvent e) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+			
+		})
+	}
+	
+	override handleEvent(Event event) {
+		println(event)
+	}
+
+	override computeSize(int wHint, int hHint, boolean changed) {
+		return new Point(6+50+6+8, 50+8)
 	}
 
 	private static class Square extends Canvas {
@@ -66,7 +88,11 @@ class RenderedNode extends Composite {
 				gc.drawRectangle(0, 0, width - 1, height - 1)
 			]
 		}
-
+		
+		override computeSize(int wHint, int hHint, boolean changed) {
+			return new Point(width, height)
+		}
+		
 	}
 
 }
