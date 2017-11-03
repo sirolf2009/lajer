@@ -55,7 +55,7 @@ class TestLajerThread {
 		val saver = new Saver()
 
 		doubler.outputPorts.get(0).connectTo(saver.inputPorts.get(0))
-		val operation = new Operation(#[doubler, saver], #[doubler.inputPorts.get(0)], #[])
+		val operation = new Operation("", #[doubler, saver], #[doubler.inputPorts.get(0)], #[])
 
 		new LajerThread(operation.inputPorts.get(0), #[2]).run()
 		Assert.assertEquals(4, saver.number)
@@ -67,7 +67,7 @@ class TestLajerThread {
 			val doubler = new Doubler()
 			val quadrupler = new Quadrupler()
 			doubler.outputPorts.get(0).connectTo(quadrupler.inputPorts.get(0))
-			new Operation(#[doubler, quadrupler], #[doubler.inputPorts.get(0)], #[quadrupler.outputPorts.get(0)])
+			new Operation("", #[doubler, quadrupler], #[doubler.inputPorts.get(0)], #[quadrupler.outputPorts.get(0)])
 		]
 		val operation1 = operation1Creator.apply(null)
 
@@ -75,12 +75,12 @@ class TestLajerThread {
 		val operation2Creator = [
 			val doubler = new Doubler()
 			doubler.outputPorts.get(0).connectTo(saver.inputPorts.get(0))
-			new Operation(#[doubler, saver], #[doubler.inputPorts.get(0)], #[])
+			new Operation("", #[doubler, saver], #[doubler.inputPorts.get(0)], #[])
 		]
 		val operation2 = operation2Creator.apply(null)
 
 		operation1.outputPorts.get(0).connectTo(operation2.inputPorts.get(0))
-		val operation = new Operation(#[operation1, operation2], #[operation1.inputPorts.get(0)], #[])
+		val operation = new Operation("", #[operation1, operation2], #[operation1.inputPorts.get(0)], #[])
 
 		new LajerThread(operation.inputPorts.get(0), #[2]).run()
 		Assert.assertEquals(32, saver.number)
@@ -100,7 +100,7 @@ class TestLajerThread {
 		doubler.outputPorts.get(0).connectTo(saver1.inputPorts.get(0))
 		doubler.outputPorts.get(0).connectTo(saver2.inputPorts.get(0))
 
-		val operation = new Operation(#[doubler, saver1, saver2], #[doubler.inputPorts.get(0)], #[])
+		val operation = new Operation("", #[doubler, saver1, saver2], #[doubler.inputPorts.get(0)], #[])
 
 		new LajerThread(operation.inputPorts.get(0), #[2]).run()
 		Thread.sleep(1000)
@@ -125,7 +125,7 @@ class TestLajerThread {
 			quadrupler.outputPorts.get(0).connectTo(saver1.inputPorts.get(0))
 			quadrupler.outputPorts.get(0).connectTo(saver2.inputPorts.get(0))
 			
-			new Operation(#[quadrupler, saver1, saver2], #[quadrupler.inputPorts.get(0)], #[])
+			new Operation("", #[quadrupler, saver1, saver2], #[quadrupler.inputPorts.get(0)], #[])
 		}
 
 		val operation2 = {
@@ -134,7 +134,7 @@ class TestLajerThread {
 			doubler.outputPorts.get(0).connectTo(operation1.inputPorts.get(0))
 			doubler.outputPorts.get(0).connectTo(saver3.inputPorts.get(0))
 			
-			new Operation(#[doubler, operation1], #[doubler.inputPorts.get(0)], #[])
+			new Operation("", #[doubler, operation1], #[doubler.inputPorts.get(0)], #[])
 		}
 
 		new LajerThread(operation2.inputPorts.get(0), #[2]).run()

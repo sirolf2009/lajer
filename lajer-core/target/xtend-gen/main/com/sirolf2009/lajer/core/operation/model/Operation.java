@@ -10,14 +10,22 @@ import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 @Data
 @SuppressWarnings("all")
 public class Operation extends Node {
+  private final String name;
+  
   private final List<Node> components;
   
   private final List<Port> inputPorts;
   
   private final List<Port> outputPorts;
   
-  public Operation(final List<Node> components, final List<Port> inputPorts, final List<Port> outputPorts) {
+  @Override
+  public String name() {
+    return this.name;
+  }
+  
+  public Operation(final String name, final List<Node> components, final List<Port> inputPorts, final List<Port> outputPorts) {
     super();
+    this.name = name;
     this.components = components;
     this.inputPorts = inputPorts;
     this.outputPorts = outputPorts;
@@ -28,6 +36,7 @@ public class Operation extends Node {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((this.name== null) ? 0 : this.name.hashCode());
     result = prime * result + ((this.components== null) ? 0 : this.components.hashCode());
     result = prime * result + ((this.inputPorts== null) ? 0 : this.inputPorts.hashCode());
     result = prime * result + ((this.outputPorts== null) ? 0 : this.outputPorts.hashCode());
@@ -44,6 +53,11 @@ public class Operation extends Node {
     if (getClass() != obj.getClass())
       return false;
     Operation other = (Operation) obj;
+    if (this.name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!this.name.equals(other.name))
+      return false;
     if (this.components == null) {
       if (other.components != null)
         return false;
@@ -69,6 +83,11 @@ public class Operation extends Node {
     	.addAllFields()
     	.toString();
     return result;
+  }
+  
+  @Pure
+  public String getName() {
+    return this.name;
   }
   
   @Pure

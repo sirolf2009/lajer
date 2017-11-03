@@ -157,7 +157,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	}
 	
 	def asOperation() {
-		return new Operation(nodes.map[node].toList(), inputPorts.map[port].toList(), outputPorts.map[port].toList())
+		return new Operation(saveFile.name, nodes.map[node].toList(), inputPorts.map[port].toList(), outputPorts.map[port].toList())
 	}
 	
 	def asState() {

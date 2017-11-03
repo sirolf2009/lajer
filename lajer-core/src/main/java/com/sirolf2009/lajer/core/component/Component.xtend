@@ -18,4 +18,8 @@ import org.eclipse.xtend.lib.annotations.Data
 		return ports
 	}
 	
+	override name() {
+		return class.simpleName
+	}
+	
 }

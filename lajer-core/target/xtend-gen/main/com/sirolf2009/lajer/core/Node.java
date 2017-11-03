@@ -8,4 +8,6 @@ public abstract class Node {
   public abstract List<Port> getInputPorts();
   
   public abstract List<Port> getOutputPorts();
+  
+  public abstract String name();
 }

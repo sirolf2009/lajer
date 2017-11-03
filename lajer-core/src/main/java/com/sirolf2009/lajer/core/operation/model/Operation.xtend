@@ -7,8 +7,13 @@ import org.eclipse.xtend.lib.annotations.Data
 
 @Data class Operation extends Node {
 	
+	val String name
 	val List<Node> components
 	val List<Port> inputPorts
 	val List<Port> outputPorts
+	
+	override name() {
+		name
+	}
 	
 }

@@ -25,6 +25,11 @@ public abstract class Component extends Node {
   }
   
   @Override
+  public String name() {
+    return this.getClass().getSimpleName();
+  }
+  
+  @Override
   @Pure
   public int hashCode() {
     final int prime = 31;

@@ -7,14 +7,12 @@ import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.util.Scanner
 import javax.swing.JOptionPane
-import org.junit.Test
 
 import static extension com.sirolf2009.lajer.core.operation.model.Connection.*
 
 class TestCalculator {
-
-	@Test
-	def void test() {
+	
+	def static getCalculator() {
 		val summer = new Summer()
 		val subtractor = new Subtractor()
 		val input = new UserInput()
@@ -25,10 +23,7 @@ class TestCalculator {
 		summer -> displayer
 		subtractor -> displayer
 		
-		val calculator = new Operation(#[input, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
-		
-		new LajerThread(calculator.inputPorts.get(0), #[]).start()
-		Thread.sleep(10000)
+		return new Operation("Calculator", #[input, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
 	}
 
 	// Component
