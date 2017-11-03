@@ -1,9 +1,16 @@
 package com.sirolf2009.lajer.ide.lajer
 
 import com.sirolf2009.lajer.core.Node
+import com.sirolf2009.lajer.core.operation.model.Operation
+import com.sirolf2009.lajer.ide.figure.InputFigure
+import com.sirolf2009.lajer.ide.figure.NodeFigure
+import com.sirolf2009.lajer.ide.figure.OutputFigure
+import com.sirolf2009.lajer.ide.figure.PortFigure
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommand
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandConnectSelected
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandDisconnectSelected
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandLoad
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedLeft
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedRight
@@ -12,11 +19,9 @@ import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateDown
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateLeft
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateRight
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateUp
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandSave
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandSelectFocused
-import com.sirolf2009.lajer.ide.model.InputFigure
-import com.sirolf2009.lajer.ide.model.NodeFigure
-import com.sirolf2009.lajer.ide.model.OutputFigure
-import com.sirolf2009.lajer.ide.model.PortFigure
+import java.io.File
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.HashSet
@@ -33,7 +38,6 @@ import org.eclipse.swt.events.KeyEvent
 import org.eclipse.swt.events.KeyListener
 import org.eclipse.swt.widgets.Canvas
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 
 @Accessors class LajerManager implements KeyListener {
 
@@ -53,21 +57,27 @@ import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 	public static val COMMAND_MOVE_SELECTED_LEFT_PRECISE = new LajerCommandMoveSelectedLeft(1)
 	public static val COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelectedRight(1)
 	public static val COMMAND_ACTIVATE_SELECTED = new LajerCommandActivateSelected()
+	public static val COMMAND_SAVE = new LajerCommandSave()
+	public static val COMMAND_LOAD = new LajerCommandLoad()
 
 	val Canvas canvas
 	val XYLayout layout
 	val Figure root
+	val File saveFile
 	val Map<String, LajerCommand> commands
 	val List<NodeFigure> nodes
 	val Set<PortFigure> selected
+	val Set<PortFigure> inputPorts
+	val Set<PortFigure> outputPorts
 	var PortFigure focused
 	var boolean ctrlPressed = false
 	var boolean shiftPressed = false
 
-	new(Canvas canvas, XYLayout layout, Figure root) {
+	new(Canvas canvas, XYLayout layout, Figure root, File saveFile) {
 		this.canvas = canvas
 		this.layout = layout
 		this.root = root
+		this.saveFile = saveFile
 		commands = new HashMap()
 		COMMAND_NAVIGATE_UP.register()
 		COMMAND_NAVIGATE_DOWN.register()
@@ -81,7 +91,11 @@ import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 		COMMAND_MOVE_SELECTED_LEFT.register()
 		COMMAND_MOVE_SELECTED_RIGHT.register()
 		COMMAND_ACTIVATE_SELECTED.register()
+		COMMAND_SAVE.register()
+		COMMAND_LOAD.register()
 		selected = new HashSet()
+		inputPorts = new HashSet()
+		outputPorts = new HashSet()
 		nodes = new ArrayList()
 	}
 
@@ -92,7 +106,7 @@ import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 	def add(Node node) {
 		val uml = new NodeFigure(this, node, new Label(node.class.simpleName))
 		nodes += uml
-		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(1000), -1, -1))
+		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(800), -1, -1))
 		root.add(uml)
 		return uml
 	}
@@ -135,7 +149,19 @@ import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 			COMMAND_DISCONNECT_SELECTED.accept(this)
 		} else if(ctrlPressed && e.keyCode == SWT.F11) {
 			COMMAND_ACTIVATE_SELECTED.accept(this)
+		} else if(ctrlPressed && e.keyCode == 's'.charAt(0)) {
+			COMMAND_SAVE.accept(this)
+		} else if(ctrlPressed && e.keyCode == 'o'.charAt(0)) {
+			COMMAND_LOAD.accept(this)
 		}
+	}
+	
+	def asOperation() {
+		return new Operation(nodes.map[node].toList(), inputPorts.map[port].toList(), outputPorts.map[port].toList())
+	}
+	
+	def asState() {
+		return new LajerState(layout, root, nodes, selected, inputPorts, outputPorts)
 	}
 
 	def focusOnFirst() {

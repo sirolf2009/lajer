@@ -1,8 +1,8 @@
 package com.sirolf2009.lajer.ide.lajer.command
 
 import com.sirolf2009.lajer.core.operation.model.Connection
+import com.sirolf2009.lajer.ide.figure.ConnectionFigure
 import com.sirolf2009.lajer.ide.lajer.LajerManager
-import com.sirolf2009.lajer.ide.model.ConnectionFigure
 
 class LajerCommandConnectSelected extends LajerCommand {
 

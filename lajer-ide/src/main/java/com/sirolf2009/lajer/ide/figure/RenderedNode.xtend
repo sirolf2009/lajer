@@ -1,4 +1,4 @@
-package com.sirolf2009.lajer.ide.model
+package com.sirolf2009.lajer.ide.figure
 
 import com.sirolf2009.lajer.core.Node
 import java.util.Optional

@@ -1,12 +1,16 @@
 package com.sirolf2009.lajer.ide
 
+import com.sirolf2009.lajer.ide.ExampleComponents.Displayer
 import com.sirolf2009.lajer.ide.ExampleComponents.Subtractor
 import com.sirolf2009.lajer.ide.ExampleComponents.Summer
+import com.sirolf2009.lajer.ide.ExampleComponents.UserInput
 import com.sirolf2009.lajer.ide.lajer.LajerManager
+import java.io.File
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.LightweightSystem
 import org.eclipse.draw2d.XYLayout
 import org.eclipse.swt.SWT
+import org.eclipse.swt.custom.SashForm
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.Canvas
@@ -15,8 +19,8 @@ import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Menu
 import org.eclipse.swt.widgets.MenuItem
 import org.eclipse.swt.widgets.Shell
-import com.sirolf2009.lajer.ide.ExampleComponents.UserInput
-import com.sirolf2009.lajer.ide.ExampleComponents.Displayer
+import org.eclipse.swt.widgets.Tree
+import org.eclipse.swt.widgets.TreeItem
 
 class LajerIDE {
 
@@ -46,40 +50,69 @@ class LajerIDE {
 				]
 			]
 		]
-		
-		new Canvas(shell, SWT.BORDER) => [
+
+		new SashForm(shell, SWT.HORIZONTAL) => [
 			layoutData = new GridData(SWT.FILL, SWT.FILL, true, true)
 			
-			val lws = new LightweightSystem(it)
-			val contents = new Figure()
-			val contentsLayout = new XYLayout()
-			contents.setLayoutManager(contentsLayout)
-			
-			val manager = new LajerManager(it, contentsLayout, contents)
-			addKeyListener(manager)
-			
-			val input = manager.add(new UserInput())
-			val summer = manager.add(new Summer())
-			val subtractor = manager.add(new Subtractor())
-			val displayer = manager.add(new Displayer())
-			
-			manager.selected += input.outputFigures.get(0)
-			manager.selected += summer.inputFigures.get(0)
-			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
-			
-			manager.selected += input.outputFigures.get(0)
-			manager.selected += subtractor.inputFigures.get(0)
-			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
-			
-			manager.selected += summer.outputFigures.get(0)
-			manager.selected += displayer.inputFigures.get(0)
-			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
-			
-			manager.selected += subtractor.outputFigures.get(0)
-			manager.selected += displayer.inputFigures.get(0)
-			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
-			
-			lws.contents = contents
+			new Canvas(it, SWT.BORDER) => [
+				val lws = new LightweightSystem(it)
+				val contents = new Figure()
+				val contentsLayout = new XYLayout()
+				contents.setLayoutManager(contentsLayout)
+
+				val manager = new LajerManager(it, contentsLayout, contents, new File("src/main/resources/Calculator.lajer"))
+				addKeyListener(manager)
+
+				val input = manager.add(new UserInput())
+				val summer = manager.add(new Summer())
+				val subtractor = manager.add(new Subtractor())
+				val displayer = manager.add(new Displayer())
+
+				manager.selected += input.outputFigures.get(0)
+				manager.selected += summer.inputFigures.get(0)
+				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+
+				manager.selected += input.outputFigures.get(0)
+				manager.selected += subtractor.inputFigures.get(0)
+				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+
+				manager.selected += summer.outputFigures.get(0)
+				manager.selected += displayer.inputFigures.get(0)
+				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+
+				manager.selected += subtractor.outputFigures.get(0)
+				manager.selected += displayer.inputFigures.get(0)
+				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+
+				lws.contents = contents
+			]
+
+			new Tree(it, SWT.SINGLE) => [
+				new TreeItem(it, SWT.NONE) => [
+					it.text = "Calculator"
+					new TreeItem(it, SWT.NONE) => [
+						text = "Components"
+						new TreeItem(it, SWT.NONE) => [
+							text = "UserInput"
+						]
+						new TreeItem(it, SWT.NONE) => [
+							text = "Summer"
+						]
+						new TreeItem(it, SWT.NONE) => [
+							text = "Subtractor"
+						]
+						new TreeItem(it, SWT.NONE) => [
+							text = "Displayer"
+						]
+					]
+					new TreeItem(it, SWT.NONE) => [
+						text = "Operations"
+						new TreeItem(it, SWT.NONE) => [
+							text = "Main"
+						]
+					]
+				]
+			]
 		]
 
 		shell.maximized = true

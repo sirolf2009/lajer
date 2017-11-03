@@ -1,4 +1,4 @@
-package com.sirolf2009.lajer.ide.model
+package com.sirolf2009.lajer.ide.figure
 
 import org.eclipse.draw2d.ChopboxAnchor
 import org.eclipse.draw2d.PolygonDecoration
