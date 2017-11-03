@@ -20,9 +20,11 @@ public class Port implements Function<List<Object>, Object> {
   
   private final MethodHandle handle;
   
-  private final List<Connection> incomingConnections = new ArrayList<Connection>();
+  @Accessors
+  private final transient List<Connection> incomingConnections = new ArrayList<Connection>();
   
-  private final List<Connection> outgoingConnections = new ArrayList<Connection>();
+  @Accessors
+  private final transient List<Connection> outgoingConnections = new ArrayList<Connection>();
   
   @Override
   public Object apply(final List<Object> args) {
@@ -45,8 +47,6 @@ public class Port implements Function<List<Object>, Object> {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((this.handle== null) ? 0 : this.handle.hashCode());
-    result = prime * result + ((this.incomingConnections== null) ? 0 : this.incomingConnections.hashCode());
-    result = prime * result + ((this.outgoingConnections== null) ? 0 : this.outgoingConnections.hashCode());
     return result;
   }
   
@@ -65,16 +65,6 @@ public class Port implements Function<List<Object>, Object> {
         return false;
     } else if (!this.handle.equals(other.handle))
       return false;
-    if (this.incomingConnections == null) {
-      if (other.incomingConnections != null)
-        return false;
-    } else if (!this.incomingConnections.equals(other.incomingConnections))
-      return false;
-    if (this.outgoingConnections == null) {
-      if (other.outgoingConnections != null)
-        return false;
-    } else if (!this.outgoingConnections.equals(other.outgoingConnections))
-      return false;
     return true;
   }
   
@@ -83,14 +73,17 @@ public class Port implements Function<List<Object>, Object> {
   public String toString() {
     ToStringBuilder b = new ToStringBuilder(this);
     b.add("handle", this.handle);
-    b.add("incomingConnections", this.incomingConnections);
-    b.add("outgoingConnections", this.outgoingConnections);
     return b.toString();
   }
   
   @Pure
   public MethodHandle getHandle() {
     return this.handle;
+  }
+  
+  @Pure
+  public Component getComponent() {
+    return this.component;
   }
   
   @Pure
@@ -101,10 +94,5 @@ public class Port implements Function<List<Object>, Object> {
   @Pure
   public List<Connection> getOutgoingConnections() {
     return this.outgoingConnections;
-  }
-  
-  @Pure
-  public Component getComponent() {
-    return this.component;
   }
 }

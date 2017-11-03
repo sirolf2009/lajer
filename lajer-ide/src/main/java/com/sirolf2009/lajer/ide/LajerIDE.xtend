@@ -1,14 +1,12 @@
 package com.sirolf2009.lajer.ide
 
-import com.sirolf2009.lajer.ide.LajerEditor.Summer
+import com.sirolf2009.lajer.ide.ExampleComponents.Subtractor
+import com.sirolf2009.lajer.ide.ExampleComponents.Summer
+import com.sirolf2009.lajer.ide.lajer.LajerManager
 import org.eclipse.draw2d.Figure
-import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.LightweightSystem
 import org.eclipse.draw2d.XYLayout
-import org.eclipse.draw2d.geometry.Rectangle
 import org.eclipse.swt.SWT
-import org.eclipse.swt.events.KeyEvent
-import org.eclipse.swt.events.KeyListener
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.Canvas
@@ -17,9 +15,8 @@ import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Menu
 import org.eclipse.swt.widgets.MenuItem
 import org.eclipse.swt.widgets.Shell
-import com.sirolf2009.lajer.ide.lajer.LajerManager
-import com.sirolf2009.lajer.ide.model.NodeFigure
-import com.sirolf2009.lajer.ide.LajerEditor.Subtractor
+import com.sirolf2009.lajer.ide.ExampleComponents.UserInput
+import com.sirolf2009.lajer.ide.ExampleComponents.Displayer
 
 class LajerIDE {
 
@@ -49,10 +46,7 @@ class LajerIDE {
 				]
 			]
 		]
-
-//		new LajerEditor(shell) => [
-//			layoutData = new GridData(SWT.FILL, SWT.FILL, true, true)
-//		]
+		
 		new Canvas(shell, SWT.BORDER) => [
 			layoutData = new GridData(SWT.FILL, SWT.FILL, true, true)
 			
@@ -63,8 +57,27 @@ class LajerIDE {
 			
 			val manager = new LajerManager(it, contentsLayout, contents)
 			addKeyListener(manager)
-			manager.add(new Summer())
-			manager.add(new Subtractor())
+			
+			val input = manager.add(new UserInput())
+			val summer = manager.add(new Summer())
+			val subtractor = manager.add(new Subtractor())
+			val displayer = manager.add(new Displayer())
+			
+			manager.selected += input.outputFigures.get(0)
+			manager.selected += summer.inputFigures.get(0)
+			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+			
+			manager.selected += input.outputFigures.get(0)
+			manager.selected += subtractor.inputFigures.get(0)
+			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+			
+			manager.selected += summer.outputFigures.get(0)
+			manager.selected += displayer.inputFigures.get(0)
+			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+			
+			manager.selected += subtractor.outputFigures.get(0)
+			manager.selected += displayer.inputFigures.get(0)
+			LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
 			
 			lws.contents = contents
 		]

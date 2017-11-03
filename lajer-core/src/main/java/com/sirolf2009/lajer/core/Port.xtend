@@ -13,8 +13,8 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	
 	@Accessors val transient Component component
 	val MethodHandle handle
-	val List<Connection> incomingConnections = new ArrayList()
-	val List<Connection> outgoingConnections = new ArrayList()
+	@Accessors val transient List<Connection> incomingConnections = new ArrayList()
+	@Accessors val transient List<Connection> outgoingConnections = new ArrayList()
 	
 	override apply(List<Object> args) {
 		return handle.invokeWithArguments(args)

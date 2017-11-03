@@ -1,18 +1,21 @@
 package com.sirolf2009.lajer.ide.lajer.command
 
-import com.sirolf2009.lajer.core.operation.model.Connection
 import com.sirolf2009.lajer.ide.lajer.LajerManager
 import com.sirolf2009.lajer.ide.model.ConnectionFigure
 
-class LajerCommandConnectSelected extends LajerCommand {
+class LajerCommandDisconnectSelected extends LajerCommand {
 
 	override accept(extension LajerManager manager) {
 		val inputs = selected.filter[isInput].toList()
 		val outputs = selected.filter[isOutput].toList()
 		inputs.forEach [ input |
 			outputs.forEach [ output |
-				Connection.connectTo(output.port, input.port)
-				manager.root.add(new ConnectionFigure(input, output))
+				val connection = input.port.incomingConnections.filter[from == output.port].findFirst[true]
+				if(connection !== null) {
+					manager.root.children.removeAll(manager.root.children.filter[it instanceof ConnectionFigure].map[it as ConnectionFigure].filter[it.input == input && it.output == output].toList())
+					connection.from.outgoingConnections.remove(connection)
+					connection.to.incomingConnections.remove(connection)
+				}
 			]
 		]
 		selected.forEach [
@@ -23,7 +26,7 @@ class LajerCommandConnectSelected extends LajerCommand {
 	}
 
 	override name() {
-		"connect-selected"
+		"disconnect-selected"
 	}
 
 	override author() {

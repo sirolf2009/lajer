@@ -3,12 +3,19 @@ package com.sirolf2009.lajer.ide.lajer
 import com.sirolf2009.lajer.core.Node
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommand
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandConnectSelected
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandDisconnectSelected
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedLeft
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedRight
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedUp
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateDown
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateLeft
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateRight
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandNavigate.NavigateUp
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandSelectFocused
+import com.sirolf2009.lajer.ide.model.InputFigure
 import com.sirolf2009.lajer.ide.model.NodeFigure
+import com.sirolf2009.lajer.ide.model.OutputFigure
 import com.sirolf2009.lajer.ide.model.PortFigure
 import java.util.ArrayList
 import java.util.HashMap
@@ -26,15 +33,26 @@ import org.eclipse.swt.events.KeyEvent
 import org.eclipse.swt.events.KeyListener
 import org.eclipse.swt.widgets.Canvas
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 
 @Accessors class LajerManager implements KeyListener {
 
-	static val COMMAND_NAVIGATE_UP = new NavigateUp(45)
-	static val COMMAND_NAVIGATE_DOWN = new NavigateDown(45)
-	static val COMMAND_NAVIGATE_LEFT = new NavigateLeft(45)
-	static val COMMAND_NAVIGATE_RIGHT = new NavigateRight(45)
-	static val COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused()
-	static val COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected()
+	public static val COMMAND_NAVIGATE_UP = new NavigateUp(45)
+	public static val COMMAND_NAVIGATE_DOWN = new NavigateDown(45)
+	public static val COMMAND_NAVIGATE_LEFT = new NavigateLeft(45)
+	public static val COMMAND_NAVIGATE_RIGHT = new NavigateRight(45)
+	public static val COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused()
+	public static val COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected()
+	public static val COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected()
+	public static val COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelectedUp(10)
+	public static val COMMAND_MOVE_SELECTED_DOWN = new LajerCommandMoveSelectedDown(10)
+	public static val COMMAND_MOVE_SELECTED_LEFT = new LajerCommandMoveSelectedLeft(10)
+	public static val COMMAND_MOVE_SELECTED_RIGHT = new LajerCommandMoveSelectedRight(10)
+	public static val COMMAND_MOVE_SELECTED_UP_PRECISE = new LajerCommandMoveSelectedUp(1)
+	public static val COMMAND_MOVE_SELECTED_DOWN_PRECISE = new LajerCommandMoveSelectedDown(1)
+	public static val COMMAND_MOVE_SELECTED_LEFT_PRECISE = new LajerCommandMoveSelectedLeft(1)
+	public static val COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelectedRight(1)
+	public static val COMMAND_ACTIVATE_SELECTED = new LajerCommandActivateSelected()
 
 	val Canvas canvas
 	val XYLayout layout
@@ -44,6 +62,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	val Set<PortFigure> selected
 	var PortFigure focused
 	var boolean ctrlPressed = false
+	var boolean shiftPressed = false
 
 	new(Canvas canvas, XYLayout layout, Figure root) {
 		this.canvas = canvas
@@ -56,10 +75,16 @@ import org.eclipse.xtend.lib.annotations.Accessors
 		COMMAND_NAVIGATE_RIGHT.register()
 		COMMAND_SELECT_FOCUSED.register()
 		COMMAND_CONNECT_SELECTED.register()
+		COMMAND_DISCONNECT_SELECTED.register()
+		COMMAND_MOVE_SELECTED_UP.register()
+		COMMAND_MOVE_SELECTED_DOWN.register()
+		COMMAND_MOVE_SELECTED_LEFT.register()
+		COMMAND_MOVE_SELECTED_RIGHT.register()
+		COMMAND_ACTIVATE_SELECTED.register()
 		selected = new HashSet()
 		nodes = new ArrayList()
 	}
-	
+
 	def register(LajerCommand command) {
 		commands.put(command.name, command)
 	}
@@ -69,13 +94,32 @@ import org.eclipse.xtend.lib.annotations.Accessors
 		nodes += uml
 		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(1000), -1, -1))
 		root.add(uml)
+		return uml
 	}
 
 	override keyPressed(KeyEvent e) {
 		if(e.keyCode == SWT.CTRL) {
 			ctrlPressed = true
+		} else if(e.keyCode == SWT.SHIFT) {
+			shiftPressed = true
 		}
-		if(e.keyCode == SWT.ARROW_LEFT) {
+		if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_UP) {
+			COMMAND_MOVE_SELECTED_UP_PRECISE.accept(this)
+		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_DOWN) {
+			COMMAND_MOVE_SELECTED_DOWN_PRECISE.accept(this)
+		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_LEFT) {
+			COMMAND_MOVE_SELECTED_LEFT_PRECISE.accept(this)
+		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_RIGHT) {
+			COMMAND_MOVE_SELECTED_RIGHT_PRECISE.accept(this)
+		} else if(shiftPressed && e.keyCode == SWT.ARROW_UP) {
+			COMMAND_MOVE_SELECTED_UP.accept(this)
+		} else if(shiftPressed && e.keyCode == SWT.ARROW_DOWN) {
+			COMMAND_MOVE_SELECTED_DOWN.accept(this)
+		} else if(shiftPressed && e.keyCode == SWT.ARROW_LEFT) {
+			COMMAND_MOVE_SELECTED_LEFT.accept(this)
+		} else if(shiftPressed && e.keyCode == SWT.ARROW_RIGHT) {
+			COMMAND_MOVE_SELECTED_RIGHT.accept(this)
+		} else if(e.keyCode == SWT.ARROW_LEFT) {
 			COMMAND_NAVIGATE_LEFT.accept(this)
 		} else if(e.keyCode == SWT.ARROW_RIGHT) {
 			COMMAND_NAVIGATE_RIGHT.accept(this)
@@ -87,6 +131,10 @@ import org.eclipse.xtend.lib.annotations.Accessors
 			COMMAND_SELECT_FOCUSED.accept(this)
 		} else if(e.keyCode == 'c'.charAt(0)) {
 			COMMAND_CONNECT_SELECTED.accept(this)
+		} else if(e.keyCode == 'd'.charAt(0)) {
+			COMMAND_DISCONNECT_SELECTED.accept(this)
+		} else if(ctrlPressed && e.keyCode == SWT.F11) {
+			COMMAND_ACTIVATE_SELECTED.accept(this)
 		}
 	}
 
@@ -120,16 +168,18 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	}
 
 	def isInput(PortFigure port) {
-		return port.node.node.inputPorts.contains(port)
+		return port instanceof InputFigure
 	}
 
 	def isOutput(PortFigure port) {
-		return port.node.node.outputPorts.contains(port)
+		return port instanceof OutputFigure
 	}
 
 	override keyReleased(KeyEvent e) {
 		if(e.keyCode == SWT.CTRL) {
 			ctrlPressed = false
+		} else if(e.keyCode == SWT.SHIFT) {
+			shiftPressed = false
 		}
 	}
 
