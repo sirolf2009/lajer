@@ -3,8 +3,12 @@ package com.sirolf2009.lajer.core.operation;
 import com.sirolf2009.lajer.core.Node;
 import com.sirolf2009.lajer.core.Port;
 import com.sirolf2009.lajer.core.component.Component;
+import com.sirolf2009.lajer.core.component.MethodPort;
 import com.sirolf2009.lajer.core.operation.model.Connection;
 import com.sirolf2009.lajer.core.operation.model.Operation;
+import com.sirolf2009.lajer.core.splitter.DummyPort;
+import com.sirolf2009.lajer.core.splitter.Splitter;
+import com.sirolf2009.lajer.core.splitter.SplitterPort;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -33,8 +37,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        Port _port = new Port(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_port));
+        MethodPort _methodPort = new MethodPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -56,8 +60,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        Port _port = new Port(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_port));
+        MethodPort _methodPort = new MethodPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -75,8 +79,24 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "readUserInput", MethodType.methodType(String.class));
-        Port _port = new Port(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_port));
+        MethodPort _methodPort = new MethodPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
+      } catch (Throwable _e) {
+        throw Exceptions.sneakyThrow(_e);
+      }
+    }
+  }
+  
+  public static class EquationChecker extends Splitter {
+    public boolean check(final String string) {
+      return string.contains("+");
+    }
+    
+    @Override
+    public SplitterPort getSplitterPort() {
+      try {
+        MethodHandle _bind = MethodHandles.lookup().bind(this, "check", MethodType.methodType(Boolean.class, String.class));
+        return new SplitterPort(this, _bind);
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -92,8 +112,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "display", MethodType.methodType(void.class, int.class));
-        Port _port = new Port(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_port));
+        MethodPort _methodPort = new MethodPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -104,9 +124,13 @@ public class TestCalculator {
     final TestCalculator.Summer summer = new TestCalculator.Summer();
     final TestCalculator.Subtractor subtractor = new TestCalculator.Subtractor();
     final TestCalculator.UserInput input = new TestCalculator.UserInput();
+    final TestCalculator.EquationChecker checker = new TestCalculator.EquationChecker();
     final TestCalculator.Displayer displayer = new TestCalculator.Displayer();
-    Connection.operator_mappedTo(input, summer);
-    Connection.operator_mappedTo(input, subtractor);
+    Connection.operator_mappedTo(input, checker);
+    DummyPort _truePort = checker.getTruePort();
+    Connection.operator_mappedTo(_truePort, summer);
+    DummyPort _falsePort = checker.getFalsePort();
+    Connection.operator_mappedTo(_falsePort, subtractor);
     Connection.operator_mappedTo(summer, displayer);
     Connection.operator_mappedTo(subtractor, displayer);
     Port _get = input.getInputPorts().get(0);

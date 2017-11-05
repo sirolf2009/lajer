@@ -9,6 +9,14 @@ import org.eclipse.xtend.lib.annotations.Data
 	val Port from
 	val Port to
 	
+	def static Connection ->(Node from, Port to) {
+		return from.outputPorts.get(0).connectTo(to)
+	}
+	
+	def static Connection ->(Port from, Node to) {
+		return from.connectTo(to.inputPorts.get(0))
+	}
+	
 	def static Connection ->(Node from, Node to) {
 		return from.connectTo(to)
 	}

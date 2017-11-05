@@ -2,10 +2,13 @@ package com.sirolf2009.lajer.ide.lajer
 
 import com.sirolf2009.lajer.core.Node
 import com.sirolf2009.lajer.core.operation.model.Operation
+import com.sirolf2009.lajer.core.splitter.Splitter
+import com.sirolf2009.lajer.ide.figure.INodeFigure
 import com.sirolf2009.lajer.ide.figure.InputFigure
 import com.sirolf2009.lajer.ide.figure.NodeFigure
 import com.sirolf2009.lajer.ide.figure.OutputFigure
 import com.sirolf2009.lajer.ide.figure.PortFigure
+import com.sirolf2009.lajer.ide.figure.SplitterFigure
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommand
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandActivateSelected
 import com.sirolf2009.lajer.ide.lajer.command.LajerCommandConnectSelected
@@ -65,7 +68,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	val Figure root
 	val File saveFile
 	val Map<String, LajerCommand> commands
-	val List<NodeFigure> nodes
+	val List<INodeFigure> nodes
 	val Set<PortFigure> selected
 	val Set<PortFigure> inputPorts
 	val Set<PortFigure> outputPorts
@@ -104,7 +107,15 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	}
 
 	def add(Node node) {
-		val uml = new NodeFigure(this, node, new Label(node.class.simpleName))
+		val uml = new NodeFigure(this, node, new Label(node.name()))
+		nodes += uml
+		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(800), -1, -1))
+		root.add(uml)
+		return uml
+	}
+
+	def add(Splitter splitter) {
+		val uml = new SplitterFigure(this, splitter, new Label(splitter.name()))
 		nodes += uml
 		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(800), -1, -1))
 		root.add(uml)

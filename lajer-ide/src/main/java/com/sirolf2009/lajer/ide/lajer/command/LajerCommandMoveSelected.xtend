@@ -1,19 +1,20 @@
 package com.sirolf2009.lajer.ide.lajer.command
 
 import com.sirolf2009.lajer.ide.lajer.LajerManager
+import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.geometry.Point
-import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.draw2d.geometry.Rectangle
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data abstract class LajerCommandMoveSelected extends LajerCommand {
 
 	val Point translation
 
 	override accept(extension LajerManager manager) {
-		if(focused !== null && focused.parent !== null) {
-			val rect = layout.getConstraint(focused.parent) as Rectangle
-			layout.setConstraint(focused.parent, rect.translate(translation))
-			layout.layout(focused.parent.parent)
+		if(focused !== null) {
+			val rect = layout.getConstraint(focused.node as Figure) as Rectangle
+			layout.setConstraint(focused.node as Figure, rect.translate(translation))
+			layout.layout((focused.node as Figure).parent)
 		}
 	}
 

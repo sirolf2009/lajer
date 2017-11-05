@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.MenuItem
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
+import com.sirolf2009.lajer.ide.ExampleComponents.EquationChecker
 
 class LajerIDE {
 
@@ -64,15 +65,20 @@ class LajerIDE {
 				addKeyListener(manager)
 
 				val input = manager.add(new UserInput())
+				val checker = manager.add(new EquationChecker())
 				val summer = manager.add(new Summer())
 				val subtractor = manager.add(new Subtractor())
 				val displayer = manager.add(new Displayer())
 
 				manager.selected += input.outputFigures.get(0)
+				manager.selected += checker.inputFigures.get(0)
+				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
+
+				manager.selected += checker.outputFigures.get(0)
 				manager.selected += summer.inputFigures.get(0)
 				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
 
-				manager.selected += input.outputFigures.get(0)
+				manager.selected += checker.outputFigures.get(1)
 				manager.selected += subtractor.inputFigures.get(0)
 				LajerManager.COMMAND_CONNECT_SELECTED.accept(manager)
 

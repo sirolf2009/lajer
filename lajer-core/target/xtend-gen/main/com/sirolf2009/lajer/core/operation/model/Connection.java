@@ -14,6 +14,14 @@ public class Connection {
   
   private final Port to;
   
+  public static Connection operator_mappedTo(final Node from, final Port to) {
+    return Connection.connectTo(from.getOutputPorts().get(0), to);
+  }
+  
+  public static Connection operator_mappedTo(final Port from, final Node to) {
+    return Connection.connectTo(from, to.getInputPorts().get(0));
+  }
+  
   public static Connection operator_mappedTo(final Node from, final Node to) {
     return Connection.connectTo(from, to);
   }

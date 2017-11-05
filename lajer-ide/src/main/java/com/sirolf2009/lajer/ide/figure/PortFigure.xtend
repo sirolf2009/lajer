@@ -20,12 +20,12 @@ class PortFigure extends Figure {
 
 	static val classColor = new Color(null, 206, 206, 225)
 	val LajerManager manager
-	@Accessors val NodeFigure node
+	@Accessors val INodeFigure node
 	@Accessors val Port port
 	@Accessors var boolean focused = false
 	@Accessors var boolean selected = false
 
-	new(NodeFigure node, Port port, LajerManager manager) {
+	new(INodeFigure node, Port port, LajerManager manager) {
 		this.node = node
 		this.port = port
 		this.manager = manager

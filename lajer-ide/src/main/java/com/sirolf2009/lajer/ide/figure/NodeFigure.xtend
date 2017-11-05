@@ -10,7 +10,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import java.util.ArrayList
 import com.sirolf2009.lajer.ide.lajer.LajerManager
 
-@Data class NodeFigure extends Figure {
+@Data class NodeFigure extends Figure implements INodeFigure {
 	
 	val Node node
 	val List<InputFigure> inputFigures

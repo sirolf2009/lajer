@@ -1,8 +1,10 @@
 package com.sirolf2009.lajer.core.operation
 
-import com.sirolf2009.lajer.core.Port
 import com.sirolf2009.lajer.core.component.Component
+import com.sirolf2009.lajer.core.component.MethodPort
 import com.sirolf2009.lajer.core.operation.model.Operation
+import com.sirolf2009.lajer.core.splitter.Splitter
+import com.sirolf2009.lajer.core.splitter.SplitterPort
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.util.Scanner
@@ -16,10 +18,12 @@ class TestCalculator {
 		val summer = new Summer()
 		val subtractor = new Subtractor()
 		val input = new UserInput()
+		val checker = new EquationChecker()
 		val displayer = new Displayer()
 		
-		input -> summer
-		input -> subtractor
+		input -> checker
+		checker.truePort -> summer
+		checker.falsePort -> subtractor
 		summer -> displayer
 		subtractor -> displayer
 		
@@ -42,7 +46,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
 
 	}
@@ -50,7 +54,7 @@ class TestCalculator {
 	// Component
 	static class Subtractor extends Component {
 
-		// method, imagine equation is 2+2
+		// method, imagine equation is 2-2
 		def int calculate(String equation) {
 			val a = Integer.parseInt(equation.split("\\-").get(0))
 			val b = Integer.parseInt(equation.split("\\-").get(1))
@@ -63,7 +67,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
 
 	}
@@ -79,9 +83,23 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
 		}
 
+	}
+
+	// Splitter
+	static class EquationChecker extends Splitter {
+
+		// Method
+		def boolean check(String string) {
+			return string.contains("+")
+		}
+		
+		override getSplitterPort() {
+			return new SplitterPort(this, MethodHandles.lookup.bind(this, "check", MethodType.methodType(Boolean, String)))
+		}
+		
 	}
 
 	// Component
@@ -93,7 +111,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
 		}
 
 	}

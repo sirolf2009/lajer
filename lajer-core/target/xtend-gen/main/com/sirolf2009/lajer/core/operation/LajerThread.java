@@ -1,6 +1,9 @@
 package com.sirolf2009.lajer.core.operation;
 
 import com.sirolf2009.lajer.core.Port;
+import com.sirolf2009.lajer.core.component.MethodPort;
+import com.sirolf2009.lajer.core.operation.model.Connection;
+import com.sirolf2009.lajer.core.splitter.SplitterPort;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,24 +32,50 @@ public class LajerThread {
   }
   
   public void runPort(final Port port, final List<Object> args) {
-    final Object result = port.apply(args);
-    int _size = port.getOutgoingConnections().size();
+    if ((port instanceof SplitterPort)) {
+      this.runSplitterPort(((SplitterPort)port), args);
+    } else {
+      if ((port instanceof MethodPort)) {
+        this.runMethodPort(((MethodPort)port), args);
+      } else {
+        throw new IllegalArgumentException(("Cannot run port " + port));
+      }
+    }
+  }
+  
+  public void runSplitterPort(final SplitterPort port, final List<Object> args) {
+    final Boolean result = port.apply(args);
+    if ((result).booleanValue()) {
+      this.propagate(args, port.getComponent().getTruePort().getOutgoingConnections());
+    } else {
+      this.propagate(args, port.getComponent().getFalsePort().getOutgoingConnections());
+    }
+  }
+  
+  public void runMethodPort(final MethodPort port, final List<Object> args) {
+    Object _apply = port.apply(args);
+    this.propagate(Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(_apply)), port.getOutgoingConnections());
+  }
+  
+  public void propagate(final List<Object> args, final List<Connection> connections) {
+    int _size = connections.size();
     boolean _equals = (_size == 1);
     if (_equals) {
-      this.runPort(port.getOutgoingConnections().get(0).getTo(), Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(result)));
+      this.runPort(connections.get(0).getTo(), args);
     } else {
-      int _size_1 = port.getOutgoingConnections().size();
+      int _size_1 = connections.size();
       boolean _greaterThan = (_size_1 > 1);
       if (_greaterThan) {
-        int _size_2 = port.getOutgoingConnections().size();
+        int _size_2 = connections.size();
         final Consumer<Integer> _function = (Integer it) -> {
           final Runnable _function_1 = () -> {
-            new LajerThread(port, args).runPort(port.getOutgoingConnections().get((it).intValue()).getTo(), Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(result)));
+            Port _from = connections.get((it).intValue()).getFrom();
+            new LajerThread(_from, args).runPort(connections.get((it).intValue()).getTo(), args);
           };
           new Thread(_function_1).start();
         };
         new ExclusiveRange(1, _size_2, true).forEach(_function);
-        this.runPort(port.getOutgoingConnections().get(0).getTo(), Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(result)));
+        this.runPort(connections.get(0).getTo(), args);
       }
     }
   }

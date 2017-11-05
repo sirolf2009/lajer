@@ -1,14 +1,16 @@
 package com.sirolf2009.lajer.ide
 
-import com.sirolf2009.lajer.core.Port
 import com.sirolf2009.lajer.core.component.Component
+import com.sirolf2009.lajer.core.component.MethodPort
+import com.sirolf2009.lajer.core.splitter.Splitter
+import com.sirolf2009.lajer.core.splitter.SplitterPort
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.util.Scanner
 import javax.swing.JOptionPane
 
 class ExampleComponents {
-	
+
 	// Component
 	static class Summer extends Component {
 
@@ -25,7 +27,7 @@ class ExampleComponents {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
 
 	}
@@ -33,7 +35,7 @@ class ExampleComponents {
 	// Component
 	static class Subtractor extends Component {
 
-		// method, imagine equation is 2+2
+		// method, imagine equation is 2-2
 		def int calculate(String equation) {
 			val a = Integer.parseInt(equation.split("\\-").get(0))
 			val b = Integer.parseInt(equation.split("\\-").get(1))
@@ -46,7 +48,7 @@ class ExampleComponents {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
 
 	}
@@ -62,9 +64,23 @@ class ExampleComponents {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
 		}
 
+	}
+
+	// Splitter
+	static class EquationChecker extends Splitter {
+
+		// Method
+		def Boolean check(String string) {
+			return string.contains("+")
+		}
+		
+		override getSplitterPort() {
+			return new SplitterPort(this, MethodHandles.lookup.bind(this, "check", MethodType.methodType(Boolean, String)))
+		}
+		
 	}
 
 	// Component
@@ -76,7 +92,7 @@ class ExampleComponents {
 		}
 		
 		override getPorts() {
-			return #[new Port(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
+			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
 		}
 
 	}
