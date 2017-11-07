@@ -15,14 +15,10 @@ import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.ToolbarLayout;
-import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-import org.eclipse.xtext.xbase.lib.Pure;
-import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
-@Data
 @SuppressWarnings("all")
 public class SplitterFigure extends Figure implements INodeFigure {
   private final Splitter splitter;
@@ -85,76 +81,18 @@ public class SplitterFigure extends Figure implements INodeFigure {
     return Collections.<OutputFigure>unmodifiableList(CollectionLiterals.<OutputFigure>newArrayList(this.trueFigure, this.falseFigure));
   }
   
-  @Override
-  @Pure
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.splitter== null) ? 0 : this.splitter.hashCode());
-    result = prime * result + ((this.inputFigure== null) ? 0 : this.inputFigure.hashCode());
-    result = prime * result + ((this.trueFigure== null) ? 0 : this.trueFigure.hashCode());
-    result = prime * result + ((this.falseFigure== null) ? 0 : this.falseFigure.hashCode());
-    return result;
-  }
-  
-  @Override
-  @Pure
-  public boolean equals(final Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    SplitterFigure other = (SplitterFigure) obj;
-    if (this.splitter == null) {
-      if (other.splitter != null)
-        return false;
-    } else if (!this.splitter.equals(other.splitter))
-      return false;
-    if (this.inputFigure == null) {
-      if (other.inputFigure != null)
-        return false;
-    } else if (!this.inputFigure.equals(other.inputFigure))
-      return false;
-    if (this.trueFigure == null) {
-      if (other.trueFigure != null)
-        return false;
-    } else if (!this.trueFigure.equals(other.trueFigure))
-      return false;
-    if (this.falseFigure == null) {
-      if (other.falseFigure != null)
-        return false;
-    } else if (!this.falseFigure.equals(other.falseFigure))
-      return false;
-    return true;
-  }
-  
-  @Override
-  @Pure
-  public String toString() {
-    String result = new ToStringBuilder(this)
-    	.addAllFields()
-    	.toString();
-    return result;
-  }
-  
-  @Pure
   public Splitter getSplitter() {
     return this.splitter;
   }
   
-  @Pure
   public InputFigure getInputFigure() {
     return this.inputFigure;
   }
   
-  @Pure
   public OutputFigure getTrueFigure() {
     return this.trueFigure;
   }
   
-  @Pure
   public OutputFigure getFalseFigure() {
     return this.falseFigure;
   }

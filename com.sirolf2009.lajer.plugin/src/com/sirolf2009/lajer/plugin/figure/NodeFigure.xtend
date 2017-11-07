@@ -8,9 +8,8 @@ import org.eclipse.draw2d.BorderLayout
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.ToolbarLayout
-import org.eclipse.xtend.lib.annotations.Data
 
-@Data class NodeFigure extends Figure implements INodeFigure {
+class NodeFigure extends Figure implements INodeFigure {
 	
 	val Node node
 	val List<InputFigure> inputFigures
@@ -45,6 +44,18 @@ import org.eclipse.xtend.lib.annotations.Data
 				])
 			]
 		])
+	}
+	
+	override getNode() {
+		return node
+	}
+	
+	override getInputFigures() {
+		return inputFigures
+	}
+	
+	override getOutputFigures() {
+		return outputFigures
 	}
 
 }

@@ -6,7 +6,6 @@ import org.eclipse.draw2d.Graphics
 import org.eclipse.draw2d.IFigure
 import org.eclipse.draw2d.geometry.Insets
 import org.eclipse.draw2d.geometry.PointList
-import org.eclipse.xtend.lib.annotations.Data
 
 class InputFigure extends PortFigure {
 
@@ -15,8 +14,12 @@ class InputFigure extends PortFigure {
 		setBorder(new InputFigureBorder(this))
 	}
 
-	@Data public static class InputFigureBorder extends PortFigureBorder {
-
+	public static class InputFigureBorder extends PortFigureBorder {
+		
+		new(PortFigure port) {
+			super(port)
+		}
+		
 		override getShape(IFigure figure, Graphics graphics, Insets insets) {
 			new PointList() => [ list |
 				getPaintRectangle(figure, insets) => [

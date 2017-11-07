@@ -13,17 +13,15 @@ import org.eclipse.draw2d.MouseMotionListener
 import org.eclipse.draw2d.geometry.Insets
 import org.eclipse.draw2d.geometry.PointList
 import org.eclipse.swt.graphics.Color
-import org.eclipse.xtend.lib.annotations.Accessors
-import org.eclipse.xtend.lib.annotations.Data
 
 class PortFigure extends Figure {
 
 	static val classColor = new Color(null, 206, 206, 225)
 	val LajerManager manager
-	@Accessors val INodeFigure node
-	@Accessors val Port port
-	@Accessors var boolean focused = false
-	@Accessors var boolean selected = false
+	val INodeFigure node
+	val Port port
+	var boolean focused = false
+	var boolean selected = false
 
 	new(INodeFigure node, Port port, LajerManager manager) {
 		this.node = node
@@ -64,11 +62,39 @@ class PortFigure extends Figure {
 
 		})
 	}
+	
+	def INodeFigure getNode() {
+		return node
+	}
+	
+	def Port getPort() {
+		return port
+	}
+	
+	def isFocused() {
+		return focused
+	}
+	
+	def setFocused(boolean focused) {
+		this.focused = focused
+	}
+	
+	def isSelected() {
+		return selected
+	}
+	
+	def setSelected(boolean selected) {
+		this.selected = selected
+	}
 
-	@Data public static abstract class PortFigureBorder extends AbstractBorder {
+	public static abstract class PortFigureBorder extends AbstractBorder {
 
 		val PortFigure port
-
+		
+		new(PortFigure port) {
+			this.port = port
+		}
+		
 		override getInsets(IFigure figure) {
 			return new Insets(6)
 		}
@@ -82,7 +108,7 @@ class PortFigure extends Figure {
 				graphics.backgroundColor = new Color(null, 52, 32, 199)
 				graphics.fillPolygon(shape)
 			} else if(port.focused) {
-				graphics.backgroundColor = new Color(null, 20, 20, 20)
+				graphics.backgroundColor = new Color(null, 229, 132, 82)
 				graphics.fillPolygon(shape)
 			}
 			graphics.drawPolygon(shape)

@@ -6,7 +6,6 @@ import org.eclipse.draw2d.Graphics
 import org.eclipse.draw2d.IFigure
 import org.eclipse.draw2d.geometry.Insets
 import org.eclipse.draw2d.geometry.PointList
-import org.eclipse.xtend.lib.annotations.Data
 
 class OutputFigure extends PortFigure {
 
@@ -15,7 +14,11 @@ class OutputFigure extends PortFigure {
 		setBorder(new OutputFigureBorder(this))
 	}
 
-	@Data public static class OutputFigureBorder extends PortFigureBorder {
+	public static class OutputFigureBorder extends PortFigureBorder {
+		
+		new(PortFigure port) {
+			super(port)
+		}
 
 		override getShape(IFigure figure, Graphics graphics, Insets insets) {
 			new PointList() => [ list |

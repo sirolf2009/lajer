@@ -6,9 +6,8 @@ import org.eclipse.draw2d.BorderLayout
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.ToolbarLayout
-import org.eclipse.xtend.lib.annotations.Data
 
-@Data class SplitterFigure extends Figure implements INodeFigure {
+class SplitterFigure extends Figure implements INodeFigure {
 
 	val Splitter splitter
 	val InputFigure inputFigure
@@ -49,6 +48,22 @@ import org.eclipse.xtend.lib.annotations.Data
 	
 	override getOutputFigures() {
 		return #[trueFigure, falseFigure]
+	}
+	
+	def getSplitter() {
+		return splitter
+	}
+	
+	def getInputFigure() {
+		return inputFigure
+	}
+	
+	def getTrueFigure() {
+		return trueFigure
+	}
+	
+	def getFalseFigure() {
+		return falseFigure
 	}
 
 }

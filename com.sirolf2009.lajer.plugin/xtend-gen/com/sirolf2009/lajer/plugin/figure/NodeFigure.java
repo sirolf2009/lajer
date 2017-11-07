@@ -14,13 +14,9 @@ import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.ToolbarLayout;
-import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-import org.eclipse.xtext.xbase.lib.Pure;
-import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
-@Data
 @SuppressWarnings("all")
 public class NodeFigure extends Figure implements INodeFigure {
   private final Node node;
@@ -84,64 +80,16 @@ public class NodeFigure extends Figure implements INodeFigure {
   }
   
   @Override
-  @Pure
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.node== null) ? 0 : this.node.hashCode());
-    result = prime * result + ((this.inputFigures== null) ? 0 : this.inputFigures.hashCode());
-    result = prime * result + ((this.outputFigures== null) ? 0 : this.outputFigures.hashCode());
-    return result;
-  }
-  
-  @Override
-  @Pure
-  public boolean equals(final Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    NodeFigure other = (NodeFigure) obj;
-    if (this.node == null) {
-      if (other.node != null)
-        return false;
-    } else if (!this.node.equals(other.node))
-      return false;
-    if (this.inputFigures == null) {
-      if (other.inputFigures != null)
-        return false;
-    } else if (!this.inputFigures.equals(other.inputFigures))
-      return false;
-    if (this.outputFigures == null) {
-      if (other.outputFigures != null)
-        return false;
-    } else if (!this.outputFigures.equals(other.outputFigures))
-      return false;
-    return true;
-  }
-  
-  @Override
-  @Pure
-  public String toString() {
-    String result = new ToStringBuilder(this)
-    	.addAllFields()
-    	.toString();
-    return result;
-  }
-  
-  @Pure
   public Node getNode() {
     return this.node;
   }
   
-  @Pure
+  @Override
   public List<InputFigure> getInputFigures() {
     return this.inputFigures;
   }
   
-  @Pure
+  @Override
   public List<OutputFigure> getOutputFigures() {
     return this.outputFigures;
   }

@@ -10,16 +10,16 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-import org.eclipse.xtext.xbase.lib.Pure;
-import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
 @SuppressWarnings("all")
 public class OutputFigure extends PortFigure {
-  @Data
   public static class OutputFigureBorder extends PortFigure.PortFigureBorder {
+    public OutputFigureBorder(final PortFigure port) {
+      super(port);
+    }
+    
     @Override
     public PointList getShape(final IFigure figure, final Graphics graphics, final Insets insets) {
       PointList _pointList = new PointList();
@@ -34,40 +34,6 @@ public class OutputFigure extends PortFigure {
         ObjectExtensions.<Rectangle>operator_doubleArrow(_paintRectangle, _function_1);
       };
       return ObjectExtensions.<PointList>operator_doubleArrow(_pointList, _function);
-    }
-    
-    public OutputFigureBorder(final PortFigure port) {
-      super(port);
-    }
-    
-    @Override
-    @Pure
-    public int hashCode() {
-      int result = super.hashCode();
-      return result;
-    }
-    
-    @Override
-    @Pure
-    public boolean equals(final Object obj) {
-      if (this == obj)
-        return true;
-      if (obj == null)
-        return false;
-      if (getClass() != obj.getClass())
-        return false;
-      if (!super.equals(obj))
-        return false;
-      return true;
-    }
-    
-    @Override
-    @Pure
-    public String toString() {
-      String result = new ToStringBuilder(this)
-      	.addAllFields()
-      	.toString();
-      return result;
     }
   }
   

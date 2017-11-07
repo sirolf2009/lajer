@@ -35,7 +35,7 @@
 		<link>
 			<name>lib/lajer-core-0.0.1-SNAPSHOT.jar</name>
 			<type>1</type>
-			<location>/home/floris/git/lajer/lajer-core/target/lajer-core-0.0.1-SNAPSHOT.jar</location>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/lajer-core/target/lajer-core-0.0.1-SNAPSHOT.jar</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
