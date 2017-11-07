@@ -88,8 +88,8 @@ public class TestCalculator {
   }
   
   public static class EquationChecker extends Splitter {
-    public boolean check(final String string) {
-      return string.contains("+");
+    public Boolean check(final String string) {
+      return Boolean.valueOf(string.contains("+"));
     }
     
     @Override
@@ -134,6 +134,6 @@ public class TestCalculator {
     Connection.operator_mappedTo(summer, displayer);
     Connection.operator_mappedTo(subtractor, displayer);
     Port _get = input.getInputPorts().get(0);
-    return new Operation("Calculator", Collections.<Node>unmodifiableList(CollectionLiterals.<Node>newArrayList(input, summer, subtractor, displayer)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_get)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList()));
+    return new Operation("Calculator", Collections.<Node>unmodifiableList(CollectionLiterals.<Node>newArrayList(input, checker, summer, subtractor, displayer)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_get)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList()));
   }
 }

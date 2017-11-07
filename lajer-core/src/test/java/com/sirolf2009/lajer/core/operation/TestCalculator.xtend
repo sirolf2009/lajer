@@ -27,7 +27,7 @@ class TestCalculator {
 		summer -> displayer
 		subtractor -> displayer
 		
-		return new Operation("Calculator", #[input, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
+		return new Operation("Calculator", #[input, checker, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
 	}
 
 	// Component
@@ -92,7 +92,7 @@ class TestCalculator {
 	static class EquationChecker extends Splitter {
 
 		// Method
-		def boolean check(String string) {
+		def Boolean check(String string) {
 			return string.contains("+")
 		}
 		

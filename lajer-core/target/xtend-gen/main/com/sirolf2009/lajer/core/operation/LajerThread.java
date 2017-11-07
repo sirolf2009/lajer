@@ -21,8 +21,11 @@ public class LajerThread {
   private final List<Object> args;
   
   public void start() {
-    final Runnable _function = () -> {
-      this.run();
+    final Runnable _function = new Runnable() {
+      @Override
+      public void run() {
+        LajerThread.this.run();
+      }
     };
     new Thread(_function).start();
   }
@@ -67,12 +70,18 @@ public class LajerThread {
       boolean _greaterThan = (_size_1 > 1);
       if (_greaterThan) {
         int _size_2 = connections.size();
-        final Consumer<Integer> _function = (Integer it) -> {
-          final Runnable _function_1 = () -> {
-            Port _from = connections.get((it).intValue()).getFrom();
-            new LajerThread(_from, args).runPort(connections.get((it).intValue()).getTo(), args);
-          };
-          new Thread(_function_1).start();
+        final Consumer<Integer> _function = new Consumer<Integer>() {
+          @Override
+          public void accept(final Integer it) {
+            final Runnable _function = new Runnable() {
+              @Override
+              public void run() {
+                Port _from = connections.get((it).intValue()).getFrom();
+                new LajerThread(_from, args).runPort(connections.get((it).intValue()).getTo(), args);
+              }
+            };
+            new Thread(_function).start();
+          }
         };
         new ExclusiveRange(1, _size_2, true).forEach(_function);
         this.runPort(connections.get(0).getTo(), args);

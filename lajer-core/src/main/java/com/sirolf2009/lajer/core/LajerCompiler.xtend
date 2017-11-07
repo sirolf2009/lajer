@@ -2,6 +2,7 @@ package com.sirolf2009.lajer.core
 
 import com.sirolf2009.lajer.core.component.Component
 import com.sirolf2009.lajer.core.operation.model.Operation
+import com.sirolf2009.lajer.core.splitter.Splitter
 import java.util.HashMap
 import java.util.HashSet
 import java.util.Map
@@ -15,7 +16,7 @@ class LajerCompiler {
 	def static compile(String groupID, extension Operation operation) {
 		val ctx = new CompilingContext(groupID)
 		return '''
-		package «groupID».operation;
+		package «groupID»;
 		
 		import java.util.Arrays;
 		import com.sirolf2009.lajer.core.operation.model.Connection;
@@ -65,12 +66,18 @@ class LajerCompiler {
 	def static declaration(CompilingContext ctx, extension Node node) {
 		if(node instanceof Component) {
 			return declaration(ctx, node as Component)
+		} else  if(node instanceof Splitter) {
+			return declaration(ctx, node as Splitter)	
 		} else {
-			return declaration(ctx, node as Operation)	
+			return declaration(ctx, node as Operation)
 		}
 	}
 	
 	def static declaration(CompilingContext ctx, extension Component node) {
+		return '''final «name().toFirstUpper()» «ctx.getVariableName(node)» = new «name().toFirstUpper()»();'''
+	}
+	
+	def static declaration(CompilingContext ctx, extension Splitter node) {
 		return '''final «name().toFirstUpper()» «ctx.getVariableName(node)» = new «name().toFirstUpper()»();'''
 	}
 	
@@ -81,6 +88,8 @@ class LajerCompiler {
 	def static importStatement(CompilingContext ctx, extension Node node) {
 		if(node instanceof Component) {
 			return importStatement(ctx, node as Component)
+		} else if(node instanceof Splitter) {
+			return importStatement(ctx, node as Splitter)
 		} else {
 			return importStatement(ctx, node as Operation)
 		}
@@ -94,9 +103,13 @@ class LajerCompiler {
 		return '''import «node.class.name.replace("$", ".")»;'''
 	}
 	
+	def static importStatement(CompilingContext ctx, extension Splitter node) {
+		return '''import «node.class.name.replace("$", ".")»;'''
+	}
+	
 	@Data static class CompilingContext {
 		
-		val String groupID 
+		val String groupID
 		val Set<String> imports = new HashSet()
 		val Map<Node, String> variableNamesNodeToString = new HashMap()
 		val Map<String, Node> variableNamesStringToNode = new HashMap()
