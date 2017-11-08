@@ -11,7 +11,6 @@ import com.sirolf2009.lajer.plugin.figure.OutputFigure
 import com.sirolf2009.lajer.plugin.figure.PortFigure
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommand
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandActivateSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
@@ -56,7 +55,6 @@ class LajerManager implements KeyListener {
 	public static val COMMAND_MOVE_SELECTED_DOWN_PRECISE = new LajerCommandMoveSelectedDown(1)
 	public static val COMMAND_MOVE_SELECTED_LEFT_PRECISE = new LajerCommandMoveSelectedLeft(1)
 	public static val COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelectedRight(1)
-	public static val COMMAND_ACTIVATE_SELECTED = new LajerCommandActivateSelected()
 
 	val Canvas canvas
 	val XYLayout layout
@@ -88,7 +86,6 @@ class LajerManager implements KeyListener {
 		COMMAND_MOVE_SELECTED_DOWN.register()
 		COMMAND_MOVE_SELECTED_LEFT.register()
 		COMMAND_MOVE_SELECTED_RIGHT.register()
-		COMMAND_ACTIVATE_SELECTED.register()
 		selected = new HashSet()
 		inputPorts = new HashSet()
 		outputPorts = new HashSet()

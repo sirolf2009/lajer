@@ -1,6 +1,7 @@
 package com.sirolf2009.lajer.plugin;
 
 import com.sirolf2009.lajer.core.LajerCompiler;
+import com.sirolf2009.lajer.core.LajerModelPersistor;
 import com.sirolf2009.lajer.core.model.ComponentModel;
 import com.sirolf2009.lajer.core.model.ConnectionModel;
 import com.sirolf2009.lajer.core.model.PortModel;
@@ -13,9 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
@@ -143,10 +147,8 @@ public class LajerEditor extends EditorPart {
                   return new PortModel(model, _arrayList_2, _arrayList_3);
                 };
                 final Consumer<PortModel> _function_4 = (PortModel it_2) -> {
-                  List<PortModel> _inputPorts = model.getInputPorts();
-                  _inputPorts.add(it_2);
-                  List<PortModel> _outputPorts = model.getOutputPorts();
-                  _outputPorts.add(it_2);
+                  model.getInputPorts().add(it_2);
+                  model.getOutputPorts().add(it_2);
                 };
                 ListExtensions.<IMethod, PortModel>map(exposed, _function_3).forEach(_function_4);
                 LajerEditor.this.manager.add(model, 10, 10);
@@ -206,9 +208,13 @@ public class LajerEditor extends EditorPart {
     try {
       monitor.beginTask("Saving", 1);
       monitor.subTask("Saving");
+      LajerModelPersistor.persistModel(this.manager.asOperation(), Paths.get(this.getEditorInput().getPath().toString()).toFile());
       monitor.subTask("Compiling");
-      final String generated = LajerCompiler.compile(this.manager.asOperation());
-      Files.write(Paths.get(this.getEditorInput().getPath().toString().replace(".lajer", ".java")), Collections.<CharSequence>unmodifiableList(CollectionLiterals.<CharSequence>newArrayList(generated)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+      String _compile = LajerCompiler.compile(this.manager.asOperation());
+      Files.write(Paths.get(this.getEditorInput().getPath().toString().replace(".lajer", ".java")), Collections.<CharSequence>unmodifiableList(CollectionLiterals.<CharSequence>newArrayList(_compile)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+      IContainer _parent = this.getEditorInput().getFile().getParent();
+      NullProgressMonitor _nullProgressMonitor = new NullProgressMonitor();
+      _parent.refreshLocal(IResource.DEPTH_ONE, _nullProgressMonitor);
       monitor.done();
       this.dirty = false;
     } catch (Throwable _e) {

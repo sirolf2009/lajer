@@ -1,9 +1,10 @@
 package com.sirolf2009.lajer.core.model
 
 import java.util.List
-import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
-@Data class NodeModel {
+@FinalFieldsConstructor @Accessors class NodeModel {
 	
 	val String fullyQualifiedName
 	val List<PortModel> inputPorts

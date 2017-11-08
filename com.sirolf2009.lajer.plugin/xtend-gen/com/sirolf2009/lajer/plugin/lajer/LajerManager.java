@@ -17,6 +17,9 @@ import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,8 +75,6 @@ public class LajerManager implements KeyListener {
   
   public final static LajerCommandMoveSelected.LajerCommandMoveSelectedRight COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedRight(1);
   
-  public final static Object COMMAND_ACTIVATE_SELECTED /* Skipped initializer because of errors */;
-  
   private final Canvas canvas;
   
   private final XYLayout layout;
@@ -99,9 +100,31 @@ public class LajerManager implements KeyListener {
   private boolean shiftPressed = false;
   
   public LajerManager(final Canvas canvas, final XYLayout layout, final Figure root, final LajerEditor editor) {
-    throw new Error("Unresolved compilation problems:"
-      + "\nThe field LajerManager.COMMAND_ACTIVATE_SELECTED refers to the missing type Object"
-      + "\nregister cannot be resolved");
+    this.canvas = canvas;
+    this.layout = layout;
+    this.root = root;
+    this.editor = editor;
+    HashMap<String, LajerCommand> _hashMap = new HashMap<String, LajerCommand>();
+    this.commands = _hashMap;
+    this.register(LajerManager.COMMAND_NAVIGATE_UP);
+    this.register(LajerManager.COMMAND_NAVIGATE_DOWN);
+    this.register(LajerManager.COMMAND_NAVIGATE_LEFT);
+    this.register(LajerManager.COMMAND_NAVIGATE_RIGHT);
+    this.register(LajerManager.COMMAND_SELECT_FOCUSED);
+    this.register(LajerManager.COMMAND_CONNECT_SELECTED);
+    this.register(LajerManager.COMMAND_DISCONNECT_SELECTED);
+    this.register(LajerManager.COMMAND_MOVE_SELECTED_UP);
+    this.register(LajerManager.COMMAND_MOVE_SELECTED_DOWN);
+    this.register(LajerManager.COMMAND_MOVE_SELECTED_LEFT);
+    this.register(LajerManager.COMMAND_MOVE_SELECTED_RIGHT);
+    HashSet<PortFigure> _hashSet = new HashSet<PortFigure>();
+    this.selected = _hashSet;
+    HashSet<PortFigure> _hashSet_1 = new HashSet<PortFigure>();
+    this.inputPorts = _hashSet_1;
+    HashSet<PortFigure> _hashSet_2 = new HashSet<PortFigure>();
+    this.outputPorts = _hashSet_2;
+    ArrayList<INodeFigure> _arrayList = new ArrayList<INodeFigure>();
+    this.nodes = _arrayList;
   }
   
   public LajerCommand register(final LajerCommand command) {

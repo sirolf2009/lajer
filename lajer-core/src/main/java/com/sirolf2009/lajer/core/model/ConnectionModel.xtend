@@ -1,8 +1,9 @@
 package com.sirolf2009.lajer.core.model
 
-import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
-@Data class ConnectionModel {
+@FinalFieldsConstructor @Accessors class ConnectionModel {
 	
 	val PortModel from
 	val PortModel to

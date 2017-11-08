@@ -1,7 +1,8 @@
 package com.sirolf2009.lajer.core.model
 
-import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
-@Data class ComponentModel extends NodeModel {
+@FinalFieldsConstructor @Accessors class ComponentModel extends NodeModel {
 	
 }

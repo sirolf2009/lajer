@@ -9,8 +9,10 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 import java.util.ArrayList
+import org.eclipse.core.resources.IResource
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.LightweightSystem
@@ -30,6 +32,7 @@ import org.eclipse.ui.IEditorSite
 import org.eclipse.ui.PartInitException
 import org.eclipse.ui.part.EditorPart
 import org.eclipse.ui.part.FileEditorInput
+import com.sirolf2009.lajer.core.LajerModelPersistor
 
 class LajerEditor extends EditorPart {
 
@@ -88,8 +91,8 @@ class LajerEditor extends EditorPart {
 						if(nodeType.elementName.equals("Component")) {
 							val model = new ComponentModel(type.fullyQualifiedName, new ArrayList(), new ArrayList())
 							exposed.map[new PortModel(model, new ArrayList(), new ArrayList())].forEach[
-								model.inputPorts += it
-								model.outputPorts += it
+								model.inputPorts.add(it)
+								model.outputPorts.add(it)
 							]
 							manager.add(model, 10, 10)
 						} else {
@@ -121,10 +124,11 @@ class LajerEditor extends EditorPart {
 	override doSave(IProgressMonitor monitor) {
 		monitor.beginTask("Saving", 1)
 		monitor.subTask("Saving")
-		
+		//TODO unify the persistence methods. This is cancer
+		LajerModelPersistor.persistModel(manager.asOperation(), Paths.get(editorInput.path.toString).toFile())
 		monitor.subTask("Compiling")
-		val generated = LajerCompiler.compile(manager.asOperation())
-		Files.write(Paths.get(editorInput.path.toString.replace(".lajer", ".java")), #[generated], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+		Files.write(Paths.get(editorInput.path.toString.replace(".lajer", ".java")), #[LajerCompiler.compile(manager.asOperation())], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+		editorInput.file.parent.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor())
 		monitor.done()
 		dirty = false
 	}

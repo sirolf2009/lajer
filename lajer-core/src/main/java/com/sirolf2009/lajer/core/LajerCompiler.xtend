@@ -14,14 +14,14 @@ class LajerCompiler {
 		
 		import java.util.Arrays;
 		import com.sirolf2009.lajer.core.operation.model.Connection;
-		import com.sirolf2009.lajer.core.operation.annotation.Operation;
+		import com.sirolf2009.lajer.core.annotation.Operation;
 		
-		«components.map[importStatement(ctx, it)].join("\n")»
+		«components.map[importStatement(ctx, it)].toSet().join("\n")»
 		
 		@Operation
 		public class «getName()» {
 			
-			public static Operation getOperation() {
+			public static com.sirolf2009.lajer.core.operation.model.Operation getOperation() {
 				«components.map[declaration(ctx, it)].sort.join("\n")»
 				
 				«connections(ctx, operation)»
