@@ -1,8 +1,8 @@
 package com.sirolf2009.lajer.plugin.lajer
 
-import com.sirolf2009.lajer.core.Node
-import com.sirolf2009.lajer.core.operation.model.Operation
-import com.sirolf2009.lajer.core.splitter.Splitter
+import com.sirolf2009.lajer.core.model.NodeModel
+import com.sirolf2009.lajer.core.model.OperationModel
+import com.sirolf2009.lajer.core.model.SplitterModel
 import com.sirolf2009.lajer.plugin.LajerEditor
 import com.sirolf2009.lajer.plugin.figure.INodeFigure
 import com.sirolf2009.lajer.plugin.figure.InputFigure
@@ -28,12 +28,12 @@ import java.util.HashMap
 import java.util.HashSet
 import java.util.List
 import java.util.Map
-import java.util.Random
 import java.util.Set
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.XYLayout
 import org.eclipse.draw2d.geometry.Rectangle
+import org.eclipse.jdt.core.JavaCore
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.KeyEvent
 import org.eclipse.swt.events.KeyListener
@@ -99,18 +99,18 @@ class LajerManager implements KeyListener {
 		commands.put(command.name, command)
 	}
 
-	def add(Node node) {
-		val uml = new NodeFigure(this, node, new Label(node.name()))
+	def add(NodeModel node, int x, int y) {
+		val uml = new NodeFigure(this, node, new Label(node.getName()))
 		nodes += uml
-		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(800), -1, -1))
+		layout.setConstraint(uml, new Rectangle(x, y, -1, -1))
 		root.add(uml)
 		return uml
 	}
 
-	def add(Splitter splitter) {
-		val uml = new SplitterFigure(this, splitter, new Label(splitter.name()))
+	def add(SplitterModel splitter, int x, int y) {
+		val uml = new SplitterFigure(this, splitter, new Label(splitter.getName()))
 		nodes += uml
-		layout.setConstraint(uml, new Rectangle(new Random().nextInt(1000), new Random().nextInt(800), -1, -1))
+		layout.setConstraint(uml, new Rectangle(x, y, -1, -1))
 		root.add(uml)
 		return uml
 	}
@@ -151,8 +151,6 @@ class LajerManager implements KeyListener {
 			COMMAND_CONNECT_SELECTED.accept(this)
 		} else if(e.keyCode == 'd'.charAt(0)) {
 			COMMAND_DISCONNECT_SELECTED.accept(this)
-		} else if(ctrlPressed && e.keyCode == SWT.F11) {
-			COMMAND_ACTIVATE_SELECTED.accept(this)
 		}
 	}
 	
@@ -161,7 +159,12 @@ class LajerManager implements KeyListener {
 	}
 
 	def asOperation() {
-		return new Operation(editor.editorInput.name, nodes.map[node].toList(), inputPorts.map[port].toList(), outputPorts.map[port].toList())
+		val file = '''/«editor.editorInput.file.project.name»/«editor.editorInput.file.projectRelativePath»'''
+		val folder = JavaCore.create(editor.editorInput.file.project).allPackageFragmentRoots.filter[
+			file.startsWith(path.makeAbsolute.toString())
+		].get(0)
+		val fullyQualifiedName = file.substring(folder.path.makeAbsolute.toString().length+1, file.length - ".lajer".length).replace("/", ".")
+		return new OperationModel(fullyQualifiedName, inputPorts.map[port].toList(), outputPorts.map[port].toList(), nodes.map[node].toList())
 	}
 
 	def focusOnFirst() {

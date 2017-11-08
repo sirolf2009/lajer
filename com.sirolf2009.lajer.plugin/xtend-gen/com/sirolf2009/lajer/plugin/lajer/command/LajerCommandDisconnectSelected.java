@@ -1,8 +1,8 @@
 package com.sirolf2009.lajer.plugin.lajer.command;
 
 import com.google.common.base.Objects;
-import com.sirolf2009.lajer.core.Port;
-import com.sirolf2009.lajer.core.operation.model.Connection;
+import com.sirolf2009.lajer.core.model.ConnectionModel;
+import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
@@ -30,15 +30,15 @@ public class LajerCommandDisconnectSelected extends LajerCommand {
       final List<PortFigure> outputs = IterableExtensions.<PortFigure>toList(IterableExtensions.<PortFigure>filter(manager.getSelected(), _function_1));
       final Consumer<PortFigure> _function_2 = (PortFigure input) -> {
         final Consumer<PortFigure> _function_3 = (PortFigure output) -> {
-          final Function1<Connection, Boolean> _function_4 = (Connection it) -> {
-            Port _from = it.getFrom();
-            Port _port = output.getPort();
+          final Function1<ConnectionModel, Boolean> _function_4 = (ConnectionModel it) -> {
+            PortModel _from = it.getFrom();
+            PortModel _port = output.getPort();
             return Boolean.valueOf(Objects.equal(_from, _port));
           };
-          final Function1<Connection, Boolean> _function_5 = (Connection it) -> {
+          final Function1<ConnectionModel, Boolean> _function_5 = (ConnectionModel it) -> {
             return Boolean.valueOf(true);
           };
-          final Connection connection = IterableExtensions.<Connection>findFirst(IterableExtensions.<Connection>filter(input.getPort().getIncomingConnections(), _function_4), _function_5);
+          final ConnectionModel connection = IterableExtensions.<ConnectionModel>findFirst(IterableExtensions.<ConnectionModel>filter(input.getPort().getIncomingConnections(), _function_4), _function_5);
           if ((connection != null)) {
             final Function1<Object, Boolean> _function_6 = (Object it) -> {
               return Boolean.valueOf((it instanceof ConnectionFigure));

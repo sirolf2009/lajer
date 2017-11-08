@@ -1,5 +1,6 @@
 package com.sirolf2009.lajer.core.operation
 
+import com.sirolf2009.lajer.core.annotation.Expose
 import com.sirolf2009.lajer.core.component.Component
 import com.sirolf2009.lajer.core.component.MethodPort
 import com.sirolf2009.lajer.core.operation.model.Operation
@@ -27,14 +28,14 @@ class TestCalculator {
 		summer -> displayer
 		subtractor -> displayer
 		
-		return new Operation("Calculator", #[input, checker, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
+		return new Operation("com.sirolf2009.lajer.Calculator", #[input, checker, summer, subtractor, displayer], #[input.inputPorts.get(0)], #[])
 	}
 
 	// Component
 	static class Summer extends Component {
 
 		// method, imagine equation is 2+2
-		def int calculate(String equation) {
+		@Expose def int calculate(String equation) {
 			val a = Integer.parseInt(equation.split("\\+").get(0))
 			val b = Integer.parseInt(equation.split("\\+").get(1))
 			return add(a, b)
@@ -48,14 +49,14 @@ class TestCalculator {
 		override getPorts() {
 			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
-
+		
 	}
 
 	// Component
 	static class Subtractor extends Component {
 
 		// method, imagine equation is 2-2
-		def int calculate(String equation) {
+		@Expose def int calculate(String equation) {
 			val a = Integer.parseInt(equation.split("\\-").get(0))
 			val b = Integer.parseInt(equation.split("\\-").get(1))
 			return subtract(a, b)
@@ -76,7 +77,7 @@ class TestCalculator {
 	static class UserInput extends Component {
 
 		// Method
-		def String readUserInput() {
+		@Expose def String readUserInput() {
 			println("Please enter an equation:")
 			val scanner = new Scanner(System.in)
 			return scanner.next()
@@ -92,7 +93,7 @@ class TestCalculator {
 	static class EquationChecker extends Splitter {
 
 		// Method
-		def Boolean check(String string) {
+		@Expose def Boolean check(String string) {
 			return string.contains("+")
 		}
 		
@@ -106,7 +107,7 @@ class TestCalculator {
 	static class Displayer extends Component {
 
 		// method, returns void so cannot be connected to another component
-		def void display(int result) {
+		@Expose def void display(int result) {
 			JOptionPane.showMessageDialog(null, "Your result is: " + result)
 		}
 		

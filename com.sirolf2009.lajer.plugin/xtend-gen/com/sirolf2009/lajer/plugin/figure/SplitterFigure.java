@@ -1,9 +1,8 @@
 package com.sirolf2009.lajer.plugin.figure;
 
-import com.sirolf2009.lajer.core.Node;
-import com.sirolf2009.lajer.core.Port;
-import com.sirolf2009.lajer.core.splitter.DummyPort;
-import com.sirolf2009.lajer.core.splitter.Splitter;
+import com.sirolf2009.lajer.core.model.NodeModel;
+import com.sirolf2009.lajer.core.model.PortModel;
+import com.sirolf2009.lajer.core.model.SplitterModel;
 import com.sirolf2009.lajer.plugin.figure.BoxFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
@@ -21,7 +20,7 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 @SuppressWarnings("all")
 public class SplitterFigure extends Figure implements INodeFigure {
-  private final Splitter splitter;
+  private final SplitterModel splitter;
   
   private final InputFigure inputFigure;
   
@@ -29,7 +28,7 @@ public class SplitterFigure extends Figure implements INodeFigure {
   
   private final OutputFigure falseFigure;
   
-  public SplitterFigure(final LajerManager manager, final Splitter splitter, final Label name) {
+  public SplitterFigure(final LajerManager manager, final SplitterModel splitter, final Label name) {
     this.splitter = splitter;
     ToolbarLayout _toolbarLayout = new ToolbarLayout();
     final Procedure1<ToolbarLayout> _function = (ToolbarLayout it) -> {
@@ -39,8 +38,8 @@ public class SplitterFigure extends Figure implements INodeFigure {
     ToolbarLayout _doubleArrow = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout, _function);
     this.setLayoutManager(_doubleArrow);
     this.setOpaque(true);
-    Port _get = splitter.getInputPorts().get(0);
-    InputFigure _inputFigure = new InputFigure(this, _get, manager);
+    PortModel _splitterPort = splitter.getSplitterPort();
+    InputFigure _inputFigure = new InputFigure(this, _splitterPort, manager);
     this.inputFigure = _inputFigure;
     this.add(this.inputFigure);
     BoxFigure _boxFigure = new BoxFigure();
@@ -49,10 +48,10 @@ public class SplitterFigure extends Figure implements INodeFigure {
     };
     BoxFigure _doubleArrow_1 = ObjectExtensions.<BoxFigure>operator_doubleArrow(_boxFigure, _function_1);
     this.add(_doubleArrow_1);
-    DummyPort _truePort = splitter.getTruePort();
+    PortModel _truePort = splitter.getTruePort();
     OutputFigure _outputFigure = new OutputFigure(this, _truePort, manager);
     this.trueFigure = _outputFigure;
-    DummyPort _falsePort = splitter.getFalsePort();
+    PortModel _falsePort = splitter.getFalsePort();
     OutputFigure _outputFigure_1 = new OutputFigure(this, _falsePort, manager);
     this.falseFigure = _outputFigure_1;
     Figure _figure = new Figure();
@@ -67,7 +66,7 @@ public class SplitterFigure extends Figure implements INodeFigure {
   }
   
   @Override
-  public Node getNode() {
+  public NodeModel getNode() {
     return this.splitter;
   }
   
@@ -81,7 +80,7 @@ public class SplitterFigure extends Figure implements INodeFigure {
     return Collections.<OutputFigure>unmodifiableList(CollectionLiterals.<OutputFigure>newArrayList(this.trueFigure, this.falseFigure));
   }
   
-  public Splitter getSplitter() {
+  public SplitterModel getSplitter() {
     return this.splitter;
   }
   

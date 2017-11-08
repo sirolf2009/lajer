@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure
 
-import com.sirolf2009.lajer.core.Port
+import com.sirolf2009.lajer.core.model.PortModel
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import org.eclipse.draw2d.Graphics
 import org.eclipse.draw2d.IFigure
@@ -9,7 +9,7 @@ import org.eclipse.draw2d.geometry.PointList
 
 class OutputFigure extends PortFigure {
 
-	new(INodeFigure node, Port port, LajerManager manager) {
+	new(INodeFigure node, PortModel port, LajerManager manager) {
 		super(node, port, manager)
 		setBorder(new OutputFigureBorder(this))
 	}

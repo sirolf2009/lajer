@@ -1,9 +1,9 @@
 package com.sirolf2009.lajer.plugin.lajer;
 
-import com.sirolf2009.lajer.core.Node;
-import com.sirolf2009.lajer.core.Port;
-import com.sirolf2009.lajer.core.operation.model.Operation;
-import com.sirolf2009.lajer.core.splitter.Splitter;
+import com.sirolf2009.lajer.core.model.NodeModel;
+import com.sirolf2009.lajer.core.model.OperationModel;
+import com.sirolf2009.lajer.core.model.PortModel;
+import com.sirolf2009.lajer.core.model.SplitterModel;
 import com.sirolf2009.lajer.plugin.LajerEditor;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
@@ -12,27 +12,28 @@ import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommand;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandActivateSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
@@ -71,7 +72,7 @@ public class LajerManager implements KeyListener {
   
   public final static LajerCommandMoveSelected.LajerCommandMoveSelectedRight COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedRight(1);
   
-  public final static LajerCommandActivateSelected COMMAND_ACTIVATE_SELECTED = new LajerCommandActivateSelected();
+  public final static Object COMMAND_ACTIVATE_SELECTED /* Skipped initializer because of errors */;
   
   private final Canvas canvas;
   
@@ -98,59 +99,32 @@ public class LajerManager implements KeyListener {
   private boolean shiftPressed = false;
   
   public LajerManager(final Canvas canvas, final XYLayout layout, final Figure root, final LajerEditor editor) {
-    this.canvas = canvas;
-    this.layout = layout;
-    this.root = root;
-    this.editor = editor;
-    HashMap<String, LajerCommand> _hashMap = new HashMap<String, LajerCommand>();
-    this.commands = _hashMap;
-    this.register(LajerManager.COMMAND_NAVIGATE_UP);
-    this.register(LajerManager.COMMAND_NAVIGATE_DOWN);
-    this.register(LajerManager.COMMAND_NAVIGATE_LEFT);
-    this.register(LajerManager.COMMAND_NAVIGATE_RIGHT);
-    this.register(LajerManager.COMMAND_SELECT_FOCUSED);
-    this.register(LajerManager.COMMAND_CONNECT_SELECTED);
-    this.register(LajerManager.COMMAND_DISCONNECT_SELECTED);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_UP);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_DOWN);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_LEFT);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_RIGHT);
-    this.register(LajerManager.COMMAND_ACTIVATE_SELECTED);
-    HashSet<PortFigure> _hashSet = new HashSet<PortFigure>();
-    this.selected = _hashSet;
-    HashSet<PortFigure> _hashSet_1 = new HashSet<PortFigure>();
-    this.inputPorts = _hashSet_1;
-    HashSet<PortFigure> _hashSet_2 = new HashSet<PortFigure>();
-    this.outputPorts = _hashSet_2;
-    ArrayList<INodeFigure> _arrayList = new ArrayList<INodeFigure>();
-    this.nodes = _arrayList;
+    throw new Error("Unresolved compilation problems:"
+      + "\nThe field LajerManager.COMMAND_ACTIVATE_SELECTED refers to the missing type Object"
+      + "\nregister cannot be resolved");
   }
   
   public LajerCommand register(final LajerCommand command) {
     return this.commands.put(command.name(), command);
   }
   
-  public NodeFigure add(final Node node) {
-    String _name = node.name();
+  public NodeFigure add(final NodeModel node, final int x, final int y) {
+    String _name = node.getName();
     Label _label = new Label(_name);
     final NodeFigure uml = new NodeFigure(this, node, _label);
     this.nodes.add(uml);
-    int _nextInt = new Random().nextInt(1000);
-    int _nextInt_1 = new Random().nextInt(800);
-    Rectangle _rectangle = new Rectangle(_nextInt, _nextInt_1, (-1), (-1));
+    Rectangle _rectangle = new Rectangle(x, y, (-1), (-1));
     this.layout.setConstraint(uml, _rectangle);
     this.root.add(uml);
     return uml;
   }
   
-  public SplitterFigure add(final Splitter splitter) {
-    String _name = splitter.name();
+  public SplitterFigure add(final SplitterModel splitter, final int x, final int y) {
+    String _name = splitter.getName();
     Label _label = new Label(_name);
     final SplitterFigure uml = new SplitterFigure(this, splitter, _label);
     this.nodes.add(uml);
-    int _nextInt = new Random().nextInt(1000);
-    int _nextInt_1 = new Random().nextInt(800);
-    Rectangle _rectangle = new Rectangle(_nextInt, _nextInt_1, (-1), (-1));
+    Rectangle _rectangle = new Rectangle(x, y, (-1), (-1));
     this.layout.setConstraint(uml, _rectangle);
     this.root.add(uml);
     return uml;
@@ -213,10 +187,6 @@ public class LajerManager implements KeyListener {
                                 boolean _equals_1 = (e.keyCode == _charAt_1);
                                 if (_equals_1) {
                                   LajerManager.COMMAND_DISCONNECT_SELECTED.accept(this);
-                                } else {
-                                  if ((this.ctrlPressed && (e.keyCode == SWT.F11))) {
-                                    LajerManager.COMMAND_ACTIVATE_SELECTED.accept(this);
-                                  }
                                 }
                               }
                             }
@@ -238,21 +208,42 @@ public class LajerManager implements KeyListener {
     return this.editor.markAsDirty();
   }
   
-  public Operation asOperation() {
-    String _name = this.editor.getEditorInput().getName();
-    final Function1<INodeFigure, Node> _function = (INodeFigure it) -> {
-      return it.getNode();
-    };
-    List<Node> _list = IterableExtensions.<Node>toList(ListExtensions.<INodeFigure, Node>map(this.nodes, _function));
-    final Function1<PortFigure, Port> _function_1 = (PortFigure it) -> {
-      return it.getPort();
-    };
-    List<Port> _list_1 = IterableExtensions.<Port>toList(IterableExtensions.<PortFigure, Port>map(this.inputPorts, _function_1));
-    final Function1<PortFigure, Port> _function_2 = (PortFigure it) -> {
-      return it.getPort();
-    };
-    List<Port> _list_2 = IterableExtensions.<Port>toList(IterableExtensions.<PortFigure, Port>map(this.outputPorts, _function_2));
-    return new Operation(_name, _list, _list_1, _list_2);
+  public OperationModel asOperation() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("/");
+      String _name = this.editor.getEditorInput().getFile().getProject().getName();
+      _builder.append(_name);
+      _builder.append("/");
+      IPath _projectRelativePath = this.editor.getEditorInput().getFile().getProjectRelativePath();
+      _builder.append(_projectRelativePath);
+      final String file = _builder.toString();
+      final Function1<IPackageFragmentRoot, Boolean> _function = (IPackageFragmentRoot it) -> {
+        return Boolean.valueOf(file.startsWith(it.getPath().makeAbsolute().toString()));
+      };
+      final IPackageFragmentRoot folder = ((IPackageFragmentRoot[])Conversions.unwrapArray(IterableExtensions.<IPackageFragmentRoot>filter(((Iterable<IPackageFragmentRoot>)Conversions.doWrapArray(JavaCore.create(this.editor.getEditorInput().getFile().getProject()).getAllPackageFragmentRoots())), _function), IPackageFragmentRoot.class))[0];
+      int _length = folder.getPath().makeAbsolute().toString().length();
+      int _plus = (_length + 1);
+      int _length_1 = file.length();
+      int _length_2 = ".lajer".length();
+      int _minus = (_length_1 - _length_2);
+      final String fullyQualifiedName = file.substring(_plus, _minus).replace("/", ".");
+      final Function1<PortFigure, PortModel> _function_1 = (PortFigure it) -> {
+        return it.getPort();
+      };
+      List<PortModel> _list = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.inputPorts, _function_1));
+      final Function1<PortFigure, PortModel> _function_2 = (PortFigure it) -> {
+        return it.getPort();
+      };
+      List<PortModel> _list_1 = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.outputPorts, _function_2));
+      final Function1<INodeFigure, NodeModel> _function_3 = (INodeFigure it) -> {
+        return it.getNode();
+      };
+      List<NodeModel> _list_2 = IterableExtensions.<NodeModel>toList(ListExtensions.<INodeFigure, NodeModel>map(this.nodes, _function_3));
+      return new OperationModel(fullyQualifiedName, _list, _list_1, _list_2);
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
   public void focusOnFirst() {

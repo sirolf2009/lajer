@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure
 
-import com.sirolf2009.lajer.core.Node
+import com.sirolf2009.lajer.core.model.NodeModel
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import java.util.ArrayList
 import java.util.List
@@ -11,11 +11,11 @@ import org.eclipse.draw2d.ToolbarLayout
 
 class NodeFigure extends Figure implements INodeFigure {
 	
-	val Node node
+	val NodeModel node
 	val List<InputFigure> inputFigures
 	val List<OutputFigure> outputFigures
 
-	new(LajerManager manager, Node node, Label name) {
+	new(LajerManager manager, NodeModel node, Label name) {
 		this.node = node
 		layoutManager = new ToolbarLayout() => [
 			minorAlignment = ToolbarLayout.ALIGN_TOPLEFT

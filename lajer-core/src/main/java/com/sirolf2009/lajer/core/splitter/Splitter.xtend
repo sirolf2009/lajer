@@ -1,9 +1,9 @@
 package com.sirolf2009.lajer.core.splitter
 
-import com.sirolf2009.lajer.core.Node
+import com.sirolf2009.lajer.core.JavaBasedNode
 import org.eclipse.xtend.lib.annotations.Data
 
-@Data abstract class Splitter extends Node {
+@Data abstract class Splitter extends JavaBasedNode {
 	
 	val splitterPort = getSplitterPort()
 	val truePort = new DummyPort(this)
@@ -17,10 +17,6 @@ import org.eclipse.xtend.lib.annotations.Data
 	
 	override getOutputPorts() {
 		return #[truePort, falsePort]
-	}
-	
-	override name() {
-		return class.simpleName
 	}
 	
 }

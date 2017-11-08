@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.lajer.command;
 
-import com.sirolf2009.lajer.core.operation.model.Connection;
+import com.sirolf2009.lajer.core.model.ConnectionModel;
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
@@ -29,7 +29,7 @@ public class LajerCommandConnectSelected extends LajerCommand {
       final List<PortFigure> outputs = IterableExtensions.<PortFigure>toList(IterableExtensions.<PortFigure>filter(manager.getSelected(), _function_1));
       final Consumer<PortFigure> _function_2 = (PortFigure input) -> {
         final Consumer<PortFigure> _function_3 = (PortFigure output) -> {
-          Connection.connectTo(output.getPort(), input.getPort());
+          ConnectionModel.connectTo(output.getPort(), input.getPort());
           Figure _root = manager.getRoot();
           ConnectionFigure _connectionFigure = new ConnectionFigure(input, output);
           _root.add(_connectionFigure);

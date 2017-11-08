@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.core.component;
 
-import com.sirolf2009.lajer.core.Node;
+import com.sirolf2009.lajer.core.JavaBasedNode;
 import com.sirolf2009.lajer.core.Port;
 import java.util.List;
 import org.eclipse.xtend.lib.annotations.Data;
@@ -9,7 +9,7 @@ import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
 @Data
 @SuppressWarnings("all")
-public abstract class Component extends Node {
+public abstract class Component extends JavaBasedNode {
   private final List<Port> ports = this.getPorts();
   
   protected abstract List<Port> getPorts();
@@ -22,11 +22,6 @@ public abstract class Component extends Node {
   @Override
   public List<Port> getOutputPorts() {
     return this.ports;
-  }
-  
-  @Override
-  public String name() {
-    return this.getClass().getSimpleName();
   }
   
   @Override

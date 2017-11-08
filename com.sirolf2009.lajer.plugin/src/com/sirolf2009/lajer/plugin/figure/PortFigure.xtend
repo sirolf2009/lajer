@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure
 
-import com.sirolf2009.lajer.core.Port
+import com.sirolf2009.lajer.core.model.PortModel
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import org.eclipse.draw2d.AbstractBorder
 import org.eclipse.draw2d.Figure
@@ -19,11 +19,11 @@ class PortFigure extends Figure {
 	static val classColor = new Color(null, 206, 206, 225)
 	val LajerManager manager
 	val INodeFigure node
-	val Port port
+	val PortModel port
 	var boolean focused = false
 	var boolean selected = false
 
-	new(INodeFigure node, Port port, LajerManager manager) {
+	new(INodeFigure node, PortModel port, LajerManager manager) {
 		this.node = node
 		this.port = port
 		this.manager = manager
@@ -67,7 +67,7 @@ class PortFigure extends Figure {
 		return node
 	}
 	
-	def Port getPort() {
+	def PortModel getPort() {
 		return port
 	}
 	

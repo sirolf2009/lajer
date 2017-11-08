@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure;
 
-import com.sirolf2009.lajer.core.Port;
+import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
 import org.eclipse.draw2d.AbstractBorder;
@@ -61,13 +61,13 @@ public class PortFigure extends Figure {
   
   private final INodeFigure node;
   
-  private final Port port;
+  private final PortModel port;
   
   private boolean focused = false;
   
   private boolean selected = false;
   
-  public PortFigure(final INodeFigure node, final Port port, final LajerManager manager) {
+  public PortFigure(final INodeFigure node, final PortModel port, final LajerManager manager) {
     this.node = node;
     this.port = port;
     this.manager = manager;
@@ -118,7 +118,7 @@ public class PortFigure extends Figure {
     return this.node;
   }
   
-  public Port getPort() {
+  public PortModel getPort() {
     return this.port;
   }
   

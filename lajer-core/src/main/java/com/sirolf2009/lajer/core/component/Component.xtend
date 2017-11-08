@@ -1,11 +1,11 @@
 package com.sirolf2009.lajer.core.component
 
-import com.sirolf2009.lajer.core.Node
+import com.sirolf2009.lajer.core.JavaBasedNode
 import com.sirolf2009.lajer.core.Port
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Data
 
-@Data abstract class Component extends Node {
+@Data abstract class Component extends JavaBasedNode {
 	
 	val ports = getPorts()
 	def protected List<Port> getPorts()
@@ -16,10 +16,6 @@ import org.eclipse.xtend.lib.annotations.Data
 	
 	override getOutputPorts() {
 		return ports
-	}
-	
-	override name() {
-		return class.simpleName
 	}
 	
 }

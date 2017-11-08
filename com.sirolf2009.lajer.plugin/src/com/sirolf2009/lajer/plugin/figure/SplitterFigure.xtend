@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure
 
-import com.sirolf2009.lajer.core.splitter.Splitter
+import com.sirolf2009.lajer.core.model.SplitterModel
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import org.eclipse.draw2d.BorderLayout
 import org.eclipse.draw2d.Figure
@@ -9,12 +9,12 @@ import org.eclipse.draw2d.ToolbarLayout
 
 class SplitterFigure extends Figure implements INodeFigure {
 
-	val Splitter splitter
+	val SplitterModel splitter
 	val InputFigure inputFigure
 	val OutputFigure trueFigure
 	val OutputFigure falseFigure
 
-	new(LajerManager manager, Splitter splitter, Label name) {
+	new(LajerManager manager, SplitterModel splitter, Label name) {
 		this.splitter = splitter
 		layoutManager = new ToolbarLayout() => [
 			minorAlignment = ToolbarLayout.ALIGN_TOPLEFT
@@ -22,7 +22,7 @@ class SplitterFigure extends Figure implements INodeFigure {
 		]
 		opaque = true
 
-		inputFigure = new InputFigure(this, splitter.inputPorts.get(0), manager)
+		inputFigure = new InputFigure(this, splitter.splitterPort, manager)
 		add(inputFigure)
 		
 		add(new BoxFigure() => [

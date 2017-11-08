@@ -6,6 +6,10 @@ abstract class Node {
 	
 	def List<Port> getInputPorts()
 	def List<Port> getOutputPorts()
-	def String name()
+	def String getFullyQualifiedName()
+	
+	def String getName() {
+		fullyQualifiedName.split("\\.").last
+	}
 	
 }

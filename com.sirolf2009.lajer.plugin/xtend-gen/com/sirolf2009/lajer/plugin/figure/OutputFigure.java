@@ -1,6 +1,6 @@
 package com.sirolf2009.lajer.plugin.figure;
 
-import com.sirolf2009.lajer.core.Port;
+import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
@@ -37,7 +37,7 @@ public class OutputFigure extends PortFigure {
     }
   }
   
-  public OutputFigure(final INodeFigure node, final Port port, final LajerManager manager) {
+  public OutputFigure(final INodeFigure node, final PortModel port, final LajerManager manager) {
     super(node, port, manager);
     OutputFigure.OutputFigureBorder _outputFigureBorder = new OutputFigure.OutputFigureBorder(this);
     this.setBorder(_outputFigureBorder);

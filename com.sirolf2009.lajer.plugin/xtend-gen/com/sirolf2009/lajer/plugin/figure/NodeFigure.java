@@ -1,7 +1,7 @@
 package com.sirolf2009.lajer.plugin.figure;
 
-import com.sirolf2009.lajer.core.Node;
-import com.sirolf2009.lajer.core.Port;
+import com.sirolf2009.lajer.core.model.NodeModel;
+import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.plugin.figure.BoxFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
@@ -19,13 +19,13 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 @SuppressWarnings("all")
 public class NodeFigure extends Figure implements INodeFigure {
-  private final Node node;
+  private final NodeModel node;
   
   private final List<InputFigure> inputFigures;
   
   private final List<OutputFigure> outputFigures;
   
-  public NodeFigure(final LajerManager manager, final Node node, final Label name) {
+  public NodeFigure(final LajerManager manager, final NodeModel node, final Label name) {
     this.node = node;
     ToolbarLayout _toolbarLayout = new ToolbarLayout();
     final Procedure1<ToolbarLayout> _function = (ToolbarLayout it) -> {
@@ -41,7 +41,7 @@ public class NodeFigure extends Figure implements INodeFigure {
     final Procedure1<Figure> _function_1 = (Figure it) -> {
       ToolbarLayout _toolbarLayout_1 = new ToolbarLayout();
       it.setLayoutManager(_toolbarLayout_1);
-      final Consumer<Port> _function_2 = (Port it_1) -> {
+      final Consumer<PortModel> _function_2 = (PortModel it_1) -> {
         InputFigure _inputFigure = new InputFigure(this, it_1, manager);
         final Procedure1<InputFigure> _function_3 = (InputFigure it_2) -> {
           this.inputFigures.add(it_2);
@@ -65,7 +65,7 @@ public class NodeFigure extends Figure implements INodeFigure {
     final Procedure1<Figure> _function_3 = (Figure it) -> {
       ToolbarLayout _toolbarLayout_1 = new ToolbarLayout();
       it.setLayoutManager(_toolbarLayout_1);
-      final Consumer<Port> _function_4 = (Port it_1) -> {
+      final Consumer<PortModel> _function_4 = (PortModel it_1) -> {
         OutputFigure _outputFigure = new OutputFigure(this, it_1, manager);
         final Procedure1<OutputFigure> _function_5 = (OutputFigure it_2) -> {
           this.outputFigures.add(it_2);
@@ -80,7 +80,7 @@ public class NodeFigure extends Figure implements INodeFigure {
   }
   
   @Override
-  public Node getNode() {
+  public NodeModel getNode() {
     return this.node;
   }
   

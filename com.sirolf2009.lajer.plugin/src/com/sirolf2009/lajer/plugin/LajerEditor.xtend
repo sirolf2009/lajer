@@ -1,19 +1,22 @@
 package com.sirolf2009.lajer.plugin
 
 import com.sirolf2009.lajer.core.LajerCompiler
-import com.sirolf2009.lajer.plugin.ExampleComponents.Displayer
-import com.sirolf2009.lajer.plugin.ExampleComponents.EquationChecker
-import com.sirolf2009.lajer.plugin.ExampleComponents.Subtractor
-import com.sirolf2009.lajer.plugin.ExampleComponents.Summer
-import com.sirolf2009.lajer.plugin.ExampleComponents.UserInput
+import com.sirolf2009.lajer.core.model.ComponentModel
+import com.sirolf2009.lajer.core.model.PortModel
+import com.sirolf2009.lajer.core.model.SplitterModel
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.util.ArrayList
+import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.core.runtime.Path
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.LightweightSystem
 import org.eclipse.draw2d.XYLayout
+import org.eclipse.jdt.core.JavaCore
+import org.eclipse.jdt.internal.core.PackageFragment
 import org.eclipse.swt.SWT
 import org.eclipse.swt.dnd.DND
 import org.eclipse.swt.dnd.DropTarget
@@ -24,15 +27,9 @@ import org.eclipse.swt.widgets.Canvas
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.IEditorSite
-import org.eclipse.ui.IFileEditorInput
 import org.eclipse.ui.PartInitException
 import org.eclipse.ui.part.EditorPart
 import org.eclipse.ui.part.FileEditorInput
-import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.core.runtime.Path
-import org.eclipse.jdt.core.search.SearchEngine
-import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jdt.internal.core.PackageFragment
 
 class LajerEditor extends EditorPart {
 
@@ -58,12 +55,6 @@ class LajerEditor extends EditorPart {
 
 			manager = new LajerManager(it, contentsLayout, contents, this)
 			addKeyListener(manager)
-
-			manager.add(new UserInput())
-			manager.add(new EquationChecker())
-			manager.add(new Summer())
-			manager.add(new Subtractor())
-			manager.add(new Displayer())
 
 			lws.contents = contents
 
@@ -91,7 +82,28 @@ class LajerEditor extends EditorPart {
 						val project = JavaCore.create(file.project)
 						val package = javaFile.parent as PackageFragment
 						val type = project.findType(package.names.join(".")+"."+javaFile.elementName.replace(".java", ""))
-						println(type.methods.join("\n"))
+						val nodeType = type.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter")].get(0)
+						val exposed = type.methods.filter[!annotations.filter[elementName.equals("Expose")].empty].toList()
+						
+						if(nodeType.elementName.equals("Component")) {
+							val model = new ComponentModel(type.fullyQualifiedName, new ArrayList(), new ArrayList())
+							exposed.map[new PortModel(model, new ArrayList(), new ArrayList())].forEach[
+								model.inputPorts += it
+								model.outputPorts += it
+							]
+							manager.add(model, 10, 10)
+						} else {
+							val model = new SplitterModel(type.fullyQualifiedName, new ArrayList(), new ArrayList())
+							if(exposed.size() == 1) {
+								model.inputPorts += new PortModel(model, new ArrayList(), new ArrayList())
+								model.outputPorts += new PortModel(model, new ArrayList(), new ArrayList())
+								model.outputPorts += new PortModel(model, new ArrayList(), new ArrayList())
+							} else {
+								throw new RuntimeException("Only one method may be exposed for a splitter")
+							}
+							manager.add(model, 10, 10)
+						}
+						markAsDirty()
 					]
 				}
 
@@ -108,9 +120,13 @@ class LajerEditor extends EditorPart {
 
 	override doSave(IProgressMonitor monitor) {
 		monitor.beginTask("Saving", 1)
-		val generated = LajerCompiler.compile("com.sirolf2009", manager.asOperation())
-		Files.write(Paths.get(editorInput.path.toString.replace(".lajer", ".java")), #[generated], StandardOpenOption.CREATE)
+		monitor.subTask("Saving")
+		
+		monitor.subTask("Compiling")
+		val generated = LajerCompiler.compile(manager.asOperation())
+		Files.write(Paths.get(editorInput.path.toString.replace(".lajer", ".java")), #[generated], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
 		monitor.done()
+		dirty = false
 	}
 
 	override doSaveAs() {

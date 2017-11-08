@@ -2,6 +2,7 @@ package com.sirolf2009.lajer.core.operation;
 
 import com.sirolf2009.lajer.core.Node;
 import com.sirolf2009.lajer.core.Port;
+import com.sirolf2009.lajer.core.annotation.Expose;
 import com.sirolf2009.lajer.core.component.Component;
 import com.sirolf2009.lajer.core.component.MethodPort;
 import com.sirolf2009.lajer.core.operation.model.Connection;
@@ -23,6 +24,7 @@ import org.eclipse.xtext.xbase.lib.InputOutput;
 @SuppressWarnings("all")
 public class TestCalculator {
   public static class Summer extends Component {
+    @Expose
     public int calculate(final String equation) {
       final int a = Integer.parseInt(equation.split("\\+")[0]);
       final int b = Integer.parseInt(equation.split("\\+")[1]);
@@ -46,6 +48,7 @@ public class TestCalculator {
   }
   
   public static class Subtractor extends Component {
+    @Expose
     public int calculate(final String equation) {
       final int a = Integer.parseInt(equation.split("\\-")[0]);
       final int b = Integer.parseInt(equation.split("\\-")[1]);
@@ -69,6 +72,7 @@ public class TestCalculator {
   }
   
   public static class UserInput extends Component {
+    @Expose
     public String readUserInput() {
       InputOutput.<String>println("Please enter an equation:");
       final Scanner scanner = new Scanner(System.in);
@@ -88,6 +92,7 @@ public class TestCalculator {
   }
   
   public static class EquationChecker extends Splitter {
+    @Expose
     public Boolean check(final String string) {
       return Boolean.valueOf(string.contains("+"));
     }
@@ -104,6 +109,7 @@ public class TestCalculator {
   }
   
   public static class Displayer extends Component {
+    @Expose
     public void display(final int result) {
       JOptionPane.showMessageDialog(null, ("Your result is: " + Integer.valueOf(result)));
     }
@@ -134,6 +140,6 @@ public class TestCalculator {
     Connection.operator_mappedTo(summer, displayer);
     Connection.operator_mappedTo(subtractor, displayer);
     Port _get = input.getInputPorts().get(0);
-    return new Operation("Calculator", Collections.<Node>unmodifiableList(CollectionLiterals.<Node>newArrayList(input, checker, summer, subtractor, displayer)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_get)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList()));
+    return new Operation("com.sirolf2009.lajer.Calculator", Collections.<Node>unmodifiableList(CollectionLiterals.<Node>newArrayList(input, checker, summer, subtractor, displayer)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_get)), Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList()));
   }
 }
