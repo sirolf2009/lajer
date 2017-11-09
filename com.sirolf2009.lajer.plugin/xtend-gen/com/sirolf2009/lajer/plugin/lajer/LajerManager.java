@@ -131,26 +131,23 @@ public class LajerManager implements KeyListener {
     return this.commands.put(command.name(), command);
   }
   
-  public NodeFigure add(final NodeModel node, final int x, final int y) {
-    String _name = node.getName();
-    Label _label = new Label(_name);
-    final NodeFigure uml = new NodeFigure(this, node, _label);
-    this.nodes.add(uml);
+  public Figure add(final NodeModel node, final int x, final int y) {
+    Figure _xifexpression = null;
+    if ((node instanceof SplitterModel)) {
+      String _name = ((SplitterModel)node).getName();
+      Label _label = new Label(_name);
+      _xifexpression = new SplitterFigure(this, ((SplitterModel)node), _label);
+    } else {
+      String _name_1 = node.getName();
+      Label _label_1 = new Label(_name_1);
+      _xifexpression = new NodeFigure(this, node, _label_1);
+    }
+    final Figure figure = ((Figure)_xifexpression);
+    this.nodes.add(((INodeFigure) figure));
     Rectangle _rectangle = new Rectangle(x, y, (-1), (-1));
-    this.layout.setConstraint(uml, _rectangle);
-    this.root.add(uml);
-    return uml;
-  }
-  
-  public SplitterFigure add(final SplitterModel splitter, final int x, final int y) {
-    String _name = splitter.getName();
-    Label _label = new Label(_name);
-    final SplitterFigure uml = new SplitterFigure(this, splitter, _label);
-    this.nodes.add(uml);
-    Rectangle _rectangle = new Rectangle(x, y, (-1), (-1));
-    this.layout.setConstraint(uml, _rectangle);
-    this.root.add(uml);
-    return uml;
+    this.layout.setConstraint(((Figure)figure), _rectangle);
+    this.root.add(((Figure)figure));
+    return ((Figure)figure);
   }
   
   @Override

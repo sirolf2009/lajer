@@ -97,19 +97,15 @@ class LajerManager implements KeyListener {
 	}
 
 	def add(NodeModel node, int x, int y) {
-		val uml = new NodeFigure(this, node, new Label(node.getName()))
-		nodes += uml
-		layout.setConstraint(uml, new Rectangle(x, y, -1, -1))
-		root.add(uml)
-		return uml
-	}
-
-	def add(SplitterModel splitter, int x, int y) {
-		val uml = new SplitterFigure(this, splitter, new Label(splitter.getName()))
-		nodes += uml
-		layout.setConstraint(uml, new Rectangle(x, y, -1, -1))
-		root.add(uml)
-		return uml
+		val figure = if(node instanceof SplitterModel) {
+				new SplitterFigure(this, node, new Label(node.getName()))
+			} else {
+				new NodeFigure(this, node, new Label(node.getName()))
+			}
+		nodes += figure as INodeFigure
+		layout.setConstraint(figure, new Rectangle(x, y, -1, -1))
+		root.add(figure)
+		return figure
 	}
 
 	override keyPressed(KeyEvent e) {
@@ -150,17 +146,17 @@ class LajerManager implements KeyListener {
 			COMMAND_DISCONNECT_SELECTED.accept(this)
 		}
 	}
-	
+
 	def markAsDirty() {
 		editor.markAsDirty()
 	}
 
 	def asOperation() {
 		val file = '''/«editor.editorInput.file.project.name»/«editor.editorInput.file.projectRelativePath»'''
-		val folder = JavaCore.create(editor.editorInput.file.project).allPackageFragmentRoots.filter[
+		val folder = JavaCore.create(editor.editorInput.file.project).allPackageFragmentRoots.filter [
 			file.startsWith(path.makeAbsolute.toString())
 		].get(0)
-		val fullyQualifiedName = file.substring(folder.path.makeAbsolute.toString().length+1, file.length - ".lajer".length).replace("/", ".")
+		val fullyQualifiedName = file.substring(folder.path.makeAbsolute.toString().length + 1, file.length - ".lajer".length).replace("/", ".")
 		return new OperationModel(fullyQualifiedName, inputPorts.map[port].toList(), outputPorts.map[port].toList(), nodes.map[node].toList())
 	}
 

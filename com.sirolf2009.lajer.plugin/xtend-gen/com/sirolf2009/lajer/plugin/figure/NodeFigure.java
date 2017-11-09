@@ -27,29 +27,31 @@ public class NodeFigure extends Figure implements INodeFigure {
   
   public NodeFigure(final LajerManager manager, final NodeModel node, final Label name) {
     this.node = node;
-    ToolbarLayout _toolbarLayout = new ToolbarLayout();
+    ToolbarLayout _toolbarLayout = new ToolbarLayout(true);
     final Procedure1<ToolbarLayout> _function = (ToolbarLayout it) -> {
-      it.setMinorAlignment(ToolbarLayout.ALIGN_TOPLEFT);
-      it.setHorizontal(true);
+      it.setStretchMinorAxis(true);
     };
     ToolbarLayout _doubleArrow = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout, _function);
     this.setLayoutManager(_doubleArrow);
-    this.setOpaque(true);
     ArrayList<InputFigure> _arrayList = new ArrayList<InputFigure>();
     this.inputFigures = _arrayList;
     Figure _figure = new Figure();
     final Procedure1<Figure> _function_1 = (Figure it) -> {
-      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout();
-      it.setLayoutManager(_toolbarLayout_1);
-      final Consumer<PortModel> _function_2 = (PortModel it_1) -> {
+      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout(false);
+      final Procedure1<ToolbarLayout> _function_2 = (ToolbarLayout it_1) -> {
+        it_1.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+      };
+      ToolbarLayout _doubleArrow_1 = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout_1, _function_2);
+      it.setLayoutManager(_doubleArrow_1);
+      final Consumer<PortModel> _function_3 = (PortModel it_1) -> {
         InputFigure _inputFigure = new InputFigure(this, it_1, manager);
-        final Procedure1<InputFigure> _function_3 = (InputFigure it_2) -> {
+        final Procedure1<InputFigure> _function_4 = (InputFigure it_2) -> {
           this.inputFigures.add(it_2);
         };
-        InputFigure _doubleArrow_1 = ObjectExtensions.<InputFigure>operator_doubleArrow(_inputFigure, _function_3);
-        this.add(_doubleArrow_1);
+        InputFigure _doubleArrow_2 = ObjectExtensions.<InputFigure>operator_doubleArrow(_inputFigure, _function_4);
+        this.add(_doubleArrow_2);
       };
-      node.getInputPorts().forEach(_function_2);
+      node.getInputPorts().forEach(_function_3);
     };
     Figure _doubleArrow_1 = ObjectExtensions.<Figure>operator_doubleArrow(_figure, _function_1);
     this.add(_doubleArrow_1);
@@ -63,17 +65,21 @@ public class NodeFigure extends Figure implements INodeFigure {
     this.outputFigures = _arrayList_1;
     Figure _figure_1 = new Figure();
     final Procedure1<Figure> _function_3 = (Figure it) -> {
-      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout();
-      it.setLayoutManager(_toolbarLayout_1);
-      final Consumer<PortModel> _function_4 = (PortModel it_1) -> {
+      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout(false);
+      final Procedure1<ToolbarLayout> _function_4 = (ToolbarLayout it_1) -> {
+        it_1.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+      };
+      ToolbarLayout _doubleArrow_3 = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout_1, _function_4);
+      it.setLayoutManager(_doubleArrow_3);
+      final Consumer<PortModel> _function_5 = (PortModel it_1) -> {
         OutputFigure _outputFigure = new OutputFigure(this, it_1, manager);
-        final Procedure1<OutputFigure> _function_5 = (OutputFigure it_2) -> {
+        final Procedure1<OutputFigure> _function_6 = (OutputFigure it_2) -> {
           this.outputFigures.add(it_2);
         };
-        OutputFigure _doubleArrow_3 = ObjectExtensions.<OutputFigure>operator_doubleArrow(_outputFigure, _function_5);
-        this.add(_doubleArrow_3);
+        OutputFigure _doubleArrow_4 = ObjectExtensions.<OutputFigure>operator_doubleArrow(_outputFigure, _function_6);
+        this.add(_doubleArrow_4);
       };
-      node.getOutputPorts().forEach(_function_4);
+      node.getOutputPorts().forEach(_function_5);
     };
     Figure _doubleArrow_3 = ObjectExtensions.<Figure>operator_doubleArrow(_figure_1, _function_3);
     this.add(_doubleArrow_3);

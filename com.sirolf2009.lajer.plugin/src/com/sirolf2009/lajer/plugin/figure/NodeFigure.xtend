@@ -17,15 +17,15 @@ class NodeFigure extends Figure implements INodeFigure {
 
 	new(LajerManager manager, NodeModel node, Label name) {
 		this.node = node
-		layoutManager = new ToolbarLayout() => [
-			minorAlignment = ToolbarLayout.ALIGN_TOPLEFT
-			horizontal = true
+		layoutManager = new ToolbarLayout(true) => [
+			stretchMinorAxis = true
 		]
-		opaque = true
 		
 		inputFigures = new ArrayList()
 		add(new Figure() => [
-			layoutManager = new ToolbarLayout()
+			layoutManager = new ToolbarLayout(false) => [
+				minorAlignment = ToolbarLayout.ALIGN_CENTER
+			]
 			node.inputPorts.forEach[
 				add(new InputFigure(this, it, manager) => [
 					inputFigures.add(it)
@@ -37,7 +37,9 @@ class NodeFigure extends Figure implements INodeFigure {
 		])
 		outputFigures = new ArrayList()
 		add(new Figure() => [
-			layoutManager = new ToolbarLayout()
+			layoutManager = new ToolbarLayout(false) => [
+				minorAlignment = ToolbarLayout.ALIGN_CENTER
+			]
 			node.outputPorts.forEach[
 				add(new OutputFigure(this, it, manager) => [
 					outputFigures.add(it)

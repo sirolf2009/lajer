@@ -23,7 +23,7 @@ class LajerModelPersistor {
 	static val nodesPattern = Pattern.compile("nodes: \\[(.*)\\]")
 	static val nodeDeclarationPattern = Pattern.compile('''\(([CSO]):([a-zA-Z0-9\.]+):([0-9]):([0-9])\)->([a-zA-Z0-9]+)''')
 	static val connectionsPattern = Pattern.compile("connections: \\[(.*)\\]")
-	static val connectionDeclarationPattern = Pattern.compile('''\(([a-zA-Z]+):([0-9])\)->\(([a-zA-Z]+):([0-9])\)''')
+	static val connectionDeclarationPattern = Pattern.compile('''\(([a-zA-Z0-9]+):([0-9])\)->\(([a-zA-Z0-9]+):([0-9])\)''')
 	static val inputsPattern = Pattern.compile("inputs: \\[(.*)\\]")
 	static val outputsPattern = Pattern.compile("outputs: \\[(.*)\\]")
 	static val portDeclarationPattern = Pattern.compile('''\(([a-zA-Z0-9]+):([0-9])\)''')
@@ -41,15 +41,15 @@ class LajerModelPersistor {
 		writer.append('''
 		version: 1
 		name: «operation.fullyQualifiedName»
-		nodes: [«operation.components.map['''(«typeID(it)»:«fullyQualifiedName»:«inputPorts.size()»:«outputPorts.size()»)->«ctx.getVariableName(it)»'''].join(",")»]
-		connections: [«operation.connections.map[
-			return '''«ctx.asInputIdentifier(from)»->«ctx.asOutputIdentifier(to)»'''
+		nodes: [«operation.components.toSet().toList().sortInplaceBy[fullyQualifiedName].map['''(«typeID(it)»:«fullyQualifiedName»:«inputPorts.size()»:«outputPorts.size()»)->«ctx.getVariableName(it)»'''].join(",")»]
+		connections: [«operation.connections.toList().sortInplaceBy[from.component.fullyQualifiedName].map[
+			return '''«ctx.asConnectionFromIdentifier(from)»->«ctx.asConnectionToIdentifier(to)»'''
 		].join(",")»]
-		inputs: [«operation.inputPorts.map[
-			return ctx.asInputIdentifier(it)
+		inputs: [«operation.inputPorts.toSet().toList().sortInplaceBy[component.fullyQualifiedName].map[
+			return ctx.asConnectionToIdentifier(it)
 		].join(",")»]
-		outputs: [«operation.outputPorts.map[
-			return ctx.asInputIdentifier(it)
+		outputs: [«operation.outputPorts.toSet().toList().sortInplaceBy[component.fullyQualifiedName].map[
+			return ctx.asConnectionFromIdentifier(it)
 		].join(",")»]''')
 		writer.flush()
 	}
@@ -66,11 +66,11 @@ class LajerModelPersistor {
 		}
 	}
 
-	def static asInputIdentifier(SerializationContext ctx, PortModel port) {
-		return '''(«ctx.getVariableName(port.component)»:«port.component.inputPorts.indexOf(port)»)'''
+	def static asConnectionFromIdentifier(SerializationContext ctx, PortModel port) {
+		return '''(«ctx.getVariableName(port.component)»:«port.component.outputPorts.indexOf(port)»)'''
 	}
 
-	def static asOutputIdentifier(SerializationContext ctx, PortModel port) {
+	def static asConnectionToIdentifier(SerializationContext ctx, PortModel port) {
 		return '''(«ctx.getVariableName(port.component)»:«port.component.inputPorts.indexOf(port)»)'''
 	}
 
@@ -86,7 +86,7 @@ class LajerModelPersistor {
 			val node = if(get(0) == "C") {
 					new ComponentModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()))
 				} else if(get(0) == "S") {
-					new ComponentModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()))
+					new SplitterModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()))
 				} else if(get(0) == "O") {
 					new OperationModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()), new ArrayList())
 				}
@@ -97,7 +97,7 @@ class LajerModelPersistor {
 		val connectionsTag = model.findOne(connectionsPattern)
 		connectionsTag.findZeroOrMoreGroups(connectionDeclarationPattern, 4).forEach [
 			val from = nodes.get(get(0)).outputPorts.get(get(1).asInt())
-			val to = nodes.get(get(2)).outputPorts.get(get(3).asInt())
+			val to = nodes.get(get(2)).inputPorts.get(get(3).asInt())
 			val connection = new ConnectionModel(from, to)
 			from.outgoingConnections += connection
 			to.incomingConnections += connection

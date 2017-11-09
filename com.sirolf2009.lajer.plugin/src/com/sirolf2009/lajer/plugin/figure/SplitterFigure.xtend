@@ -16,9 +16,8 @@ class SplitterFigure extends Figure implements INodeFigure {
 
 	new(LajerManager manager, SplitterModel splitter, Label name) {
 		this.splitter = splitter
-		layoutManager = new ToolbarLayout() => [
-			minorAlignment = ToolbarLayout.ALIGN_TOPLEFT
-			horizontal = true
+		layoutManager = new ToolbarLayout(true) => [
+			stretchMinorAxis = true
 		]
 		opaque = true
 
@@ -32,7 +31,9 @@ class SplitterFigure extends Figure implements INodeFigure {
 		trueFigure = new OutputFigure(this, splitter.truePort, manager)
 		falseFigure = new OutputFigure(this, splitter.falsePort, manager)
 		add(new Figure() => [
-			layoutManager = new ToolbarLayout()
+			layoutManager = new ToolbarLayout(false) => [
+				minorAlignment = ToolbarLayout.ALIGN_CENTER
+			]
 			add(trueFigure)
 			add(falseFigure)
 		])

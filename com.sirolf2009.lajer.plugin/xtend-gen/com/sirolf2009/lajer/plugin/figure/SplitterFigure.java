@@ -30,10 +30,9 @@ public class SplitterFigure extends Figure implements INodeFigure {
   
   public SplitterFigure(final LajerManager manager, final SplitterModel splitter, final Label name) {
     this.splitter = splitter;
-    ToolbarLayout _toolbarLayout = new ToolbarLayout();
+    ToolbarLayout _toolbarLayout = new ToolbarLayout(true);
     final Procedure1<ToolbarLayout> _function = (ToolbarLayout it) -> {
-      it.setMinorAlignment(ToolbarLayout.ALIGN_TOPLEFT);
-      it.setHorizontal(true);
+      it.setStretchMinorAxis(true);
     };
     ToolbarLayout _doubleArrow = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout, _function);
     this.setLayoutManager(_doubleArrow);
@@ -56,8 +55,12 @@ public class SplitterFigure extends Figure implements INodeFigure {
     this.falseFigure = _outputFigure_1;
     Figure _figure = new Figure();
     final Procedure1<Figure> _function_2 = (Figure it) -> {
-      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout();
-      it.setLayoutManager(_toolbarLayout_1);
+      ToolbarLayout _toolbarLayout_1 = new ToolbarLayout(false);
+      final Procedure1<ToolbarLayout> _function_3 = (ToolbarLayout it_1) -> {
+        it_1.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+      };
+      ToolbarLayout _doubleArrow_2 = ObjectExtensions.<ToolbarLayout>operator_doubleArrow(_toolbarLayout_1, _function_3);
+      it.setLayoutManager(_doubleArrow_2);
       it.add(this.trueFigure);
       it.add(this.falseFigure);
     };
