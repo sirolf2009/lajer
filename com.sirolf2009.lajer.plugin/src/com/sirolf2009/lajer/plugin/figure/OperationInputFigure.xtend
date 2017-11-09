@@ -3,9 +3,8 @@ package com.sirolf2009.lajer.plugin.figure
 import org.eclipse.draw2d.Ellipse
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.StackLayout
-import org.eclipse.draw2d.geometry.Insets
-import org.eclipse.swt.graphics.Color
 import org.eclipse.draw2d.geometry.Dimension
+import org.eclipse.swt.graphics.Color
 
 class OperationInputFigure extends Figure {
 	
@@ -15,10 +14,6 @@ class OperationInputFigure extends Figure {
 			backgroundColor = new Color(null, 0, 0, 0)
 			size = new Dimension(20, 20)
 		])
-	}
-	
-	override getInsets() {
-		return new Insets(6)
 	}
 	
 }

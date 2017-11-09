@@ -6,7 +6,11 @@ import com.sirolf2009.lajer.core.model.ComponentModel
 import com.sirolf2009.lajer.core.model.OperationModel
 import com.sirolf2009.lajer.core.model.PortModel
 import com.sirolf2009.lajer.core.model.SplitterModel
+import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure
+import com.sirolf2009.lajer.plugin.figure.OperationInputFigure
+import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure
+import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,6 +27,7 @@ import org.eclipse.core.runtime.Path
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.LightweightSystem
 import org.eclipse.draw2d.XYLayout
+import org.eclipse.draw2d.geometry.Rectangle
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.internal.core.PackageFragment
 import org.eclipse.swt.SWT
@@ -38,9 +43,6 @@ import org.eclipse.ui.IEditorSite
 import org.eclipse.ui.PartInitException
 import org.eclipse.ui.part.EditorPart
 import org.eclipse.ui.part.FileEditorInput
-import com.sirolf2009.lajer.plugin.figure.OperationInputFigure
-import org.eclipse.draw2d.geometry.Rectangle
-import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure
 
 class LajerEditor extends EditorPart {
 
@@ -73,25 +75,42 @@ class LajerEditor extends EditorPart {
 			addKeyListener(manager)
 
 			inputFile.ifPresent [
-				components.forEach[node|manager.add(node, positions.get(node).key, positions.get(node).value)]
-				connections.forEach [ connection |
-					val from = manager.nodes.flatMap[outputFigures.filter[port === connection.from]].get(0)
-					val to = manager.nodes.flatMap[inputFigures.filter[port === connection.to]].get(0)
-					manager.root.add(new ConnectionFigure(to, from))
-				]
-				inputPorts.forEach [inputPort|
-					val portFigure = manager.nodes.flatMap[inputFigures.filter[port === inputPort]].get(0)
-					val operationInputFigure = new OperationInputFigure()
-					val rectOrigin = manager.getConstraint(portFigure.node)
-					contents.add(operationInputFigure, new Rectangle(rectOrigin.center.x - 80, rectOrigin.center.y, -1, -1))
-					val connection = new OriginConnectionFigure(operationInputFigure, portFigure)
-					contents.add(connection)
-					manager.inputPorts.add(portFigure)
-					portFigure.node.addFigureListener [
-						val rect = manager.getConstraint(portFigure)
-						contentsLayout.setConstraint(operationInputFigure, new Rectangle(rect.center.x - 80, rect.center.y, -1, -1))
+				try {
+					components.forEach[node|manager.add(node, positions.get(node).key, positions.get(node).value)]
+					connections.forEach [ connection |
+						val from = manager.nodes.flatMap[outputFigures.filter[port === connection.from]].get(0)
+						val to = manager.nodes.flatMap[inputFigures.filter[port === connection.to]].get(0)
+						manager.root.add(new ConnectionFigure(to, from))
 					]
-				]
+					inputPorts.forEach [ inputPort |
+						val portFigure = manager.nodes.flatMap[inputFigures.filter[port === inputPort]].get(0)
+						val operationInputFigure = new OperationInputFigure()
+						val rectOrigin = manager.getConstraint(portFigure.node)
+						contents.add(operationInputFigure, new Rectangle(rectOrigin.center.x - 80, rectOrigin.center.y, -1, -1))
+						val connection = new OriginConnectionFigure(operationInputFigure, portFigure)
+						contents.add(connection)
+						manager.inputPorts.add(portFigure)
+						portFigure.node.addFigureListener [
+							val rect = manager.getConstraint(portFigure.node)
+							contentsLayout.setConstraint(operationInputFigure, new Rectangle(rect.center.x - 80, rect.center.y, -1, -1))
+						]
+					]
+					outputPorts.forEach [ outputPort |
+						val portFigure = manager.nodes.flatMap[outputFigures.filter[port === outputPort]].get(0)
+						val operationOutputFigure = new OperationOutputFigure()
+						val rectOrigin = manager.getConstraint(portFigure.node)
+						contents.add(operationOutputFigure, new Rectangle(rectOrigin.center.x + 160, rectOrigin.center.y, -1, -1))
+						val connection = new CallbackConnectionFigure(portFigure, operationOutputFigure)
+						contents.add(connection)
+						manager.outputPorts.add(portFigure)
+						portFigure.node.addFigureListener [
+							val rect = manager.getConstraint(portFigure.node)
+							contentsLayout.setConstraint(operationOutputFigure, new Rectangle(rect.center.x + 160, rect.center.y, -1, -1))
+						]
+					]
+				} catch(Exception e) {
+					e.printStackTrace()
+				}
 			]
 
 			lws.contents = contents
@@ -191,5 +210,5 @@ class LajerEditor extends EditorPart {
 	override getPartName() {
 		return editorInput.file.name
 	}
-
+	
 }

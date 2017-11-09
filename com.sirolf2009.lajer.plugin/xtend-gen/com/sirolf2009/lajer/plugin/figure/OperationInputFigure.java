@@ -4,7 +4,6 @@ import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
@@ -23,10 +22,5 @@ public class OperationInputFigure extends Figure {
     };
     Ellipse _doubleArrow = ObjectExtensions.<Ellipse>operator_doubleArrow(_ellipse, _function);
     this.add(_doubleArrow);
-  }
-  
-  @Override
-  public Insets getInsets() {
-    return new Insets(6);
   }
 }

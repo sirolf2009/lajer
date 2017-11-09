@@ -4,7 +4,7 @@
 	<groupId>com.sirolf2009</groupId>
 	<artifactId>lajer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>xtend-quickstart</name>
+	<name>Lajer - parent</name>
 	<packaging>pom</packaging>
 
 	<properties>

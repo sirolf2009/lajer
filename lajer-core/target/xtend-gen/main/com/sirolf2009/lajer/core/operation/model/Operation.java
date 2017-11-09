@@ -24,23 +24,14 @@ public class Operation extends Node {
   private final List<Port> outputPorts;
   
   public Set<Connection> getConnections() {
-    final Function<Node, Stream<Connection>> _function = new Function<Node, Stream<Connection>>() {
-      @Override
-      public Stream<Connection> apply(final Node it) {
-        final Function<Port, Stream<Connection>> _function = new Function<Port, Stream<Connection>>() {
-          @Override
-          public Stream<Connection> apply(final Port it) {
-            return it.getIncomingConnections().stream();
-          }
-        };
-        final Function<Port, Stream<Connection>> _function_1 = new Function<Port, Stream<Connection>>() {
-          @Override
-          public Stream<Connection> apply(final Port it) {
-            return it.getOutgoingConnections().stream();
-          }
-        };
-        return Stream.<Connection>concat(it.getInputPorts().stream().<Connection>flatMap(_function), it.getOutputPorts().stream().<Connection>flatMap(_function_1));
-      }
+    final Function<Node, Stream<Connection>> _function = (Node it) -> {
+      final Function<Port, Stream<Connection>> _function_1 = (Port it_1) -> {
+        return it_1.getIncomingConnections().stream();
+      };
+      final Function<Port, Stream<Connection>> _function_2 = (Port it_1) -> {
+        return it_1.getOutgoingConnections().stream();
+      };
+      return Stream.<Connection>concat(it.getInputPorts().stream().<Connection>flatMap(_function_1), it.getOutputPorts().stream().<Connection>flatMap(_function_2));
     };
     return this.components.stream().<Connection>flatMap(_function).collect(Collectors.<Connection>toSet());
   }

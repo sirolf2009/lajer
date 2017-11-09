@@ -8,10 +8,12 @@ import com.sirolf2009.lajer.core.model.NodeModel;
 import com.sirolf2009.lajer.core.model.OperationModel;
 import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.core.model.SplitterModel;
+import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
 import com.sirolf2009.lajer.plugin.figure.OperationInputFigure;
+import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure;
 import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
@@ -119,58 +121,91 @@ public class LajerEditor extends EditorPart {
       this.manager = _lajerManager;
       it.addKeyListener(this.manager);
       final Consumer<OperationModel> _function_1 = (OperationModel it_1) -> {
-        final Consumer<NodeModel> _function_2 = (NodeModel node) -> {
-          this.manager.add(node, (it_1.getPositions().get(node).getKey()).intValue(), (it_1.getPositions().get(node).getValue()).intValue());
-        };
-        it_1.getComponents().forEach(_function_2);
-        final Consumer<ConnectionModel> _function_3 = (ConnectionModel connection) -> {
-          final Function1<INodeFigure, Iterable<OutputFigure>> _function_4 = (INodeFigure it_2) -> {
-            final Function1<OutputFigure, Boolean> _function_5 = (OutputFigure it_3) -> {
-              PortModel _port = it_3.getPort();
-              PortModel _from = connection.getFrom();
-              return Boolean.valueOf((_port == _from));
+        try {
+          final Consumer<NodeModel> _function_2 = (NodeModel node) -> {
+            this.manager.add(node, (it_1.getPositions().get(node).getKey()).intValue(), (it_1.getPositions().get(node).getValue()).intValue());
+          };
+          it_1.getComponents().forEach(_function_2);
+          final Consumer<ConnectionModel> _function_3 = (ConnectionModel connection) -> {
+            final Function1<INodeFigure, Iterable<OutputFigure>> _function_4 = (INodeFigure it_2) -> {
+              final Function1<OutputFigure, Boolean> _function_5 = (OutputFigure it_3) -> {
+                PortModel _port = it_3.getPort();
+                PortModel _from = connection.getFrom();
+                return Boolean.valueOf((_port == _from));
+              };
+              return IterableExtensions.<OutputFigure>filter(it_2.getOutputFigures(), _function_5);
             };
-            return IterableExtensions.<OutputFigure>filter(it_2.getOutputFigures(), _function_5);
-          };
-          final OutputFigure from = ((OutputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, OutputFigure>flatMap(this.manager.getNodes(), _function_4), OutputFigure.class))[0];
-          final Function1<INodeFigure, Iterable<InputFigure>> _function_5 = (INodeFigure it_2) -> {
-            final Function1<InputFigure, Boolean> _function_6 = (InputFigure it_3) -> {
-              PortModel _port = it_3.getPort();
-              PortModel _to = connection.getTo();
-              return Boolean.valueOf((_port == _to));
+            final OutputFigure from = ((OutputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, OutputFigure>flatMap(this.manager.getNodes(), _function_4), OutputFigure.class))[0];
+            final Function1<INodeFigure, Iterable<InputFigure>> _function_5 = (INodeFigure it_2) -> {
+              final Function1<InputFigure, Boolean> _function_6 = (InputFigure it_3) -> {
+                PortModel _port = it_3.getPort();
+                PortModel _to = connection.getTo();
+                return Boolean.valueOf((_port == _to));
+              };
+              return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
             };
-            return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
+            final InputFigure to = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
+            Figure _root = this.manager.getRoot();
+            ConnectionFigure _connectionFigure = new ConnectionFigure(to, from);
+            _root.add(_connectionFigure);
           };
-          final InputFigure to = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
-          Figure _root = this.manager.getRoot();
-          ConnectionFigure _connectionFigure = new ConnectionFigure(to, from);
-          _root.add(_connectionFigure);
-        };
-        it_1.getConnections().forEach(_function_3);
-        final Consumer<PortModel> _function_4 = (PortModel inputPort) -> {
-          final Function1<INodeFigure, Iterable<InputFigure>> _function_5 = (INodeFigure it_2) -> {
-            final Function1<InputFigure, Boolean> _function_6 = (InputFigure it_3) -> {
-              PortModel _port = it_3.getPort();
-              return Boolean.valueOf((_port == inputPort));
+          it_1.getConnections().forEach(_function_3);
+          final Consumer<PortModel> _function_4 = (PortModel inputPort) -> {
+            final Function1<INodeFigure, Iterable<InputFigure>> _function_5 = (INodeFigure it_2) -> {
+              final Function1<InputFigure, Boolean> _function_6 = (InputFigure it_3) -> {
+                PortModel _port = it_3.getPort();
+                return Boolean.valueOf((_port == inputPort));
+              };
+              return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
             };
-            return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
+            final InputFigure portFigure = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
+            final OperationInputFigure operationInputFigure = new OperationInputFigure();
+            final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
+            Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x - 80), rectOrigin.getCenter().y, (-1), (-1));
+            contents.add(operationInputFigure, _rectangle);
+            final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, portFigure);
+            contents.add(connection);
+            this.manager.getInputPorts().add(portFigure);
+            final FigureListener _function_6 = (IFigure it_2) -> {
+              final Rectangle rect = this.manager.getConstraint(portFigure.getNode());
+              Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x - 80), rect.getCenter().y, (-1), (-1));
+              contentsLayout.setConstraint(operationInputFigure, _rectangle_1);
+            };
+            portFigure.getNode().addFigureListener(_function_6);
           };
-          final InputFigure portFigure = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
-          final OperationInputFigure operationInputFigure = new OperationInputFigure();
-          final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
-          Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x - 80), rectOrigin.getCenter().y, (-1), (-1));
-          contents.add(operationInputFigure, _rectangle);
-          final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, portFigure);
-          contents.add(connection);
-          this.manager.getInputPorts().add(portFigure);
-          final FigureListener _function_6 = (IFigure it_2) -> {
-            final Rectangle rect = this.manager.getConstraint(portFigure);
-            Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x - 80), rect.getCenter().y, (-1), (-1));
-            contentsLayout.setConstraint(operationInputFigure, _rectangle_1);
+          it_1.getInputPorts().forEach(_function_4);
+          final Consumer<PortModel> _function_5 = (PortModel outputPort) -> {
+            final Function1<INodeFigure, Iterable<OutputFigure>> _function_6 = (INodeFigure it_2) -> {
+              final Function1<OutputFigure, Boolean> _function_7 = (OutputFigure it_3) -> {
+                PortModel _port = it_3.getPort();
+                return Boolean.valueOf((_port == outputPort));
+              };
+              return IterableExtensions.<OutputFigure>filter(it_2.getOutputFigures(), _function_7);
+            };
+            final OutputFigure portFigure = ((OutputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, OutputFigure>flatMap(this.manager.getNodes(), _function_6), OutputFigure.class))[0];
+            final OperationOutputFigure operationOutputFigure = new OperationOutputFigure();
+            final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
+            Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x + 160), rectOrigin.getCenter().y, (-1), (-1));
+            contents.add(operationOutputFigure, _rectangle);
+            final CallbackConnectionFigure connection = new CallbackConnectionFigure(portFigure, operationOutputFigure);
+            contents.add(connection);
+            this.manager.getOutputPorts().add(portFigure);
+            final FigureListener _function_7 = (IFigure it_2) -> {
+              final Rectangle rect = this.manager.getConstraint(portFigure.getNode());
+              Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x + 160), rect.getCenter().y, (-1), (-1));
+              contentsLayout.setConstraint(operationOutputFigure, _rectangle_1);
+            };
+            portFigure.getNode().addFigureListener(_function_7);
           };
-          portFigure.getNode().addFigureListener(_function_6);
-        };
-        it_1.getInputPorts().forEach(_function_4);
+          it_1.getOutputPorts().forEach(_function_5);
+        } catch (final Throwable _t) {
+          if (_t instanceof Exception) {
+            final Exception e = (Exception)_t;
+            e.printStackTrace();
+          } else {
+            throw Exceptions.sneakyThrow(_t);
+          }
+        }
       };
       this.inputFile.ifPresent(_function_1);
       lws.setContents(contents);

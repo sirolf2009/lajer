@@ -13,6 +13,7 @@ import com.sirolf2009.lajer.plugin.figure.SplitterFigure
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsOutput
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedLeft
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedRight
@@ -49,6 +50,7 @@ class LajerManager implements KeyListener {
 	public static val COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected()
 	public static val COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected()
 	public static val COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput()
+	public static val COMMAND_MARK_SELECTED_AS_OUTPUT = new LajerCommandMarkSelectedAsOutput()
 	public static val COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelectedUp(10)
 	public static val COMMAND_MOVE_SELECTED_DOWN = new LajerCommandMoveSelectedDown(10)
 	public static val COMMAND_MOVE_SELECTED_LEFT = new LajerCommandMoveSelectedLeft(10)
@@ -69,6 +71,7 @@ class LajerManager implements KeyListener {
 	var PortFigure focused
 	var boolean ctrlPressed = false
 	var boolean shiftPressed = false
+	var boolean altPressed = false
 
 	new(Canvas canvas, XYLayout layout, Figure root, LajerEditor editor) {
 		this.canvas = canvas
@@ -98,6 +101,8 @@ class LajerManager implements KeyListener {
 			ctrlPressed = true
 		} else if(e.keyCode == SWT.SHIFT) {
 			shiftPressed = true
+		} else if(e.keyCode == SWT.ALT) {
+			altPressed = true
 		}
 		if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_UP) {
 			COMMAND_MOVE_SELECTED_UP_PRECISE.accept(this)
@@ -131,8 +136,10 @@ class LajerManager implements KeyListener {
 			COMMAND_DISCONNECT_SELECTED.accept(this)
 		} else if(e.keyCode == SWT.DEL) {
 			COMMAND_REMOVE_SELECTED.accept(this)
-		} else if(ctrlPressed && e.keyCode == 'i'.charAt(0)) {
+		} else if(altPressed && e.keyCode == 'i'.charAt(0)) {
 			COMMAND_MARK_SELECTED_AS_INPUT.accept(this)
+		} else if(altPressed && e.keyCode == 'o'.charAt(0)) {
+			COMMAND_MARK_SELECTED_AS_OUTPUT.accept(this)
 		}
 	}
 
@@ -146,7 +153,7 @@ class LajerManager implements KeyListener {
 			file.startsWith(path.makeAbsolute.toString())
 		].get(0)
 		val fullyQualifiedName = file.substring(folder.path.makeAbsolute.toString().length + 1, file.length - ".lajer".length).replace("/", ".")
-		val positions = nodes.map[
+		val positions = nodes.map [
 			val constraint = layout.getConstraint(it) as Rectangle
 			node -> (constraint.topLeft.x -> constraint.topLeft.y)
 		].toMap([key], [value])
@@ -157,13 +164,14 @@ class LajerManager implements KeyListener {
 		unfocus()
 		var i = 0
 		while(focused === null && i < nodes.size()) {
-			nodes.get(i) => [
-				if(!inputFigures.isEmpty()) {
-					inputFigures.get(0).focus()
-				} else if(!outputFigures.isEmpty()) {
-					outputFigures.get(0).focus()
-				}
-			]
+			val it = nodes.get(i)
+			if(!inputFigures.isEmpty()) {
+				inputFigures.get(0).focus()
+			} else if(!outputFigures.isEmpty()) {
+				outputFigures.get(0).focus()
+			} else {
+				i++
+			}
 		}
 	}
 
@@ -181,7 +189,7 @@ class LajerManager implements KeyListener {
 		focused.focused = true
 		focused.repaint()
 	}
-	
+
 	def getConstraint(IFigure figure) {
 		return layout.getConstraint(figure) as Rectangle
 	}
@@ -199,6 +207,8 @@ class LajerManager implements KeyListener {
 			ctrlPressed = false
 		} else if(e.keyCode == SWT.SHIFT) {
 			shiftPressed = false
+		} else if(e.keyCode == SWT.ALT) {
+			altPressed = false
 		}
 	}
 
@@ -221,11 +231,11 @@ class LajerManager implements KeyListener {
 	def getFocused() {
 		return focused
 	}
-	
+
 	def getInputPorts() {
 		return inputPorts
 	}
-	
+
 	def getOutputPorts() {
 		return outputPorts
 	}

@@ -28,3 +28,9 @@
 /.OperationInputFigure.java._trace
 /.OriginConnection.java._trace
 /.OriginConnectionFigure.java._trace
+/.OperationInputFigure.xtendbin
+/.OriginConnectionFigure.xtendbin
+/OperationInputFigure.java
+/OriginConnectionFigure.java
+/.OperationOutputFigure.java._trace
+/.CallbackConnectionFigure.java._trace

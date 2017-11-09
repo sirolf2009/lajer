@@ -14,6 +14,7 @@ import com.sirolf2009.lajer.plugin.figure.SplitterFigure;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput;
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsOutput;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandRemoveSelected;
@@ -41,9 +42,7 @@ import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.Pair;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 @SuppressWarnings("all")
 public class LajerManager implements KeyListener {
@@ -64,6 +63,8 @@ public class LajerManager implements KeyListener {
   public final static LajerCommandDisconnectSelected COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected();
   
   public final static LajerCommandMarkSelectedAsInput COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput();
+  
+  public final static LajerCommandMarkSelectedAsOutput COMMAND_MARK_SELECTED_AS_OUTPUT = new LajerCommandMarkSelectedAsOutput();
   
   public final static LajerCommandMoveSelected.LajerCommandMoveSelectedUp COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelected.LajerCommandMoveSelectedUp(10);
   
@@ -102,6 +103,8 @@ public class LajerManager implements KeyListener {
   private boolean ctrlPressed = false;
   
   private boolean shiftPressed = false;
+  
+  private boolean altPressed = false;
   
   public LajerManager(final Canvas canvas, final XYLayout layout, final Figure root, final LajerEditor editor) {
     this.canvas = canvas;
@@ -144,6 +147,10 @@ public class LajerManager implements KeyListener {
     } else {
       if ((e.keyCode == SWT.SHIFT)) {
         this.shiftPressed = true;
+      } else {
+        if ((e.keyCode == SWT.ALT)) {
+          this.altPressed = true;
+        }
       }
     }
     if (((this.ctrlPressed && this.shiftPressed) && (e.keyCode == SWT.ARROW_UP))) {
@@ -198,8 +205,12 @@ public class LajerManager implements KeyListener {
                                   if ((e.keyCode == SWT.DEL)) {
                                     LajerManager.COMMAND_REMOVE_SELECTED.accept(this);
                                   } else {
-                                    if ((this.ctrlPressed && (e.keyCode == "i".charAt(0)))) {
+                                    if ((this.altPressed && (e.keyCode == "i".charAt(0)))) {
                                       LajerManager.COMMAND_MARK_SELECTED_AS_INPUT.accept(this);
+                                    } else {
+                                      if ((this.altPressed && (e.keyCode == "o".charAt(0)))) {
+                                        LajerManager.COMMAND_MARK_SELECTED_AS_OUTPUT.accept(this);
+                                      }
                                     }
                                   }
                                 }
@@ -283,8 +294,8 @@ public class LajerManager implements KeyListener {
     this.unfocus();
     int i = 0;
     while (((this.focused == null) && (i < this.nodes.size()))) {
-      INodeFigure _get = this.nodes.get(i);
-      final Procedure1<INodeFigure> _function = (INodeFigure it) -> {
+      {
+        final INodeFigure it = this.nodes.get(i);
         boolean _isEmpty = it.getInputFigures().isEmpty();
         boolean _not = (!_isEmpty);
         if (_not) {
@@ -294,10 +305,11 @@ public class LajerManager implements KeyListener {
           boolean _not_1 = (!_isEmpty_1);
           if (_not_1) {
             this.focus(it.getOutputFigures().get(0));
+          } else {
+            i++;
           }
         }
-      };
-      ObjectExtensions.<INodeFigure>operator_doubleArrow(_get, _function);
+      }
     }
   }
   
@@ -342,6 +354,10 @@ public class LajerManager implements KeyListener {
     } else {
       if ((e.keyCode == SWT.SHIFT)) {
         this.shiftPressed = false;
+      } else {
+        if ((e.keyCode == SWT.ALT)) {
+          this.altPressed = false;
+        }
       }
     }
   }
