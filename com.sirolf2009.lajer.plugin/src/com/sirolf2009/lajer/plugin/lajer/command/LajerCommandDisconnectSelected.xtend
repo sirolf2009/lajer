@@ -28,12 +28,4 @@ class LajerCommandDisconnectSelected extends LajerCommand {
 		}
 	}
 
-	override name() {
-		"disconnect-selected"
-	}
-
-	override author() {
-		"sirolf2009"
-	}
-
 }

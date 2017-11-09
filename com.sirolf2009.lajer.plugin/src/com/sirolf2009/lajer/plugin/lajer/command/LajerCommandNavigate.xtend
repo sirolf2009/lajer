@@ -60,28 +60,12 @@ abstract class LajerCommandNavigate extends LajerCommand {
 			super([it > 270 - losRange && it < 270 + losRange])
 		}
 
-		override name() {
-			"navigate-up"
-		}
-
-		override author() {
-			"sirolf2009"
-		}
-
 	}
 
 	public static class NavigateRight extends LajerCommandNavigate {
 
 		new(int losRange) {
 			super([it > 360 - losRange || it < losRange])
-		}
-
-		override name() {
-			"navigate-right"
-		}
-
-		override author() {
-			"sirolf2009"
 		}
 
 	}
@@ -92,28 +76,12 @@ abstract class LajerCommandNavigate extends LajerCommand {
 			super([it > 90 - losRange && it < 90 + losRange])
 		}
 
-		override name() {
-			"navigate-down"
-		}
-
-		override author() {
-			"sirolf2009"
-		}
-
 	}
 
 	public static class NavigateLeft extends LajerCommandNavigate {
 
 		new(int losRange) {
 			super([it > 180 - losRange && it < 180 + losRange])
-		}
-
-		override name() {
-			"navigate-left"
-		}
-
-		override author() {
-			"sirolf2009"
 		}
 
 	}

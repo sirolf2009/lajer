@@ -11,6 +11,8 @@ import com.sirolf2009.lajer.core.model.SplitterModel;
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
+import com.sirolf2009.lajer.plugin.figure.OperationInputFigure;
+import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
 import java.io.BufferedReader;
@@ -34,8 +36,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FigureListener;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.XYLayout;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -114,8 +119,8 @@ public class LajerEditor extends EditorPart {
       this.manager = _lajerManager;
       it.addKeyListener(this.manager);
       final Consumer<OperationModel> _function_1 = (OperationModel it_1) -> {
-        final Consumer<NodeModel> _function_2 = (NodeModel it_2) -> {
-          this.manager.add(it_2, 10, 10);
+        final Consumer<NodeModel> _function_2 = (NodeModel node) -> {
+          this.manager.add(node, (it_1.getPositions().get(node).getKey()).intValue(), (it_1.getPositions().get(node).getValue()).intValue());
         };
         it_1.getComponents().forEach(_function_2);
         final Consumer<ConnectionModel> _function_3 = (ConnectionModel connection) -> {
@@ -142,6 +147,30 @@ public class LajerEditor extends EditorPart {
           _root.add(_connectionFigure);
         };
         it_1.getConnections().forEach(_function_3);
+        final Consumer<PortModel> _function_4 = (PortModel inputPort) -> {
+          final Function1<INodeFigure, Iterable<InputFigure>> _function_5 = (INodeFigure it_2) -> {
+            final Function1<InputFigure, Boolean> _function_6 = (InputFigure it_3) -> {
+              PortModel _port = it_3.getPort();
+              return Boolean.valueOf((_port == inputPort));
+            };
+            return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
+          };
+          final InputFigure portFigure = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
+          final OperationInputFigure operationInputFigure = new OperationInputFigure();
+          final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
+          Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x - 80), rectOrigin.getCenter().y, (-1), (-1));
+          contents.add(operationInputFigure, _rectangle);
+          final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, portFigure);
+          contents.add(connection);
+          this.manager.getInputPorts().add(portFigure);
+          final FigureListener _function_6 = (IFigure it_2) -> {
+            final Rectangle rect = this.manager.getConstraint(portFigure);
+            Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x - 80), rect.getCenter().y, (-1), (-1));
+            contentsLayout.setConstraint(operationInputFigure, _rectangle_1);
+          };
+          portFigure.getNode().addFigureListener(_function_6);
+        };
+        it_1.getInputPorts().forEach(_function_4);
       };
       this.inputFile.ifPresent(_function_1);
       lws.setContents(contents);

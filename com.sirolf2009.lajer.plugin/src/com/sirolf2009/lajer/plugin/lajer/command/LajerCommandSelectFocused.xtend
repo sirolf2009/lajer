@@ -17,12 +17,4 @@ class LajerCommandSelectFocused extends LajerCommand {
 		}
 	}
 
-	override name() {
-		"select-focused"
-	}
-
-	override author() {
-		"sirolf2009"
-	}
-
 }

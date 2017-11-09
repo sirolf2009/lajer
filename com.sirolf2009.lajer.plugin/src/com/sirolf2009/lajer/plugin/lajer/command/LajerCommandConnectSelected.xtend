@@ -25,12 +25,4 @@ class LajerCommandConnectSelected extends LajerCommand {
 		}
 	}
 
-	override name() {
-		"connect-selected"
-	}
-
-	override author() {
-		"sirolf2009"
-	}
-
 }

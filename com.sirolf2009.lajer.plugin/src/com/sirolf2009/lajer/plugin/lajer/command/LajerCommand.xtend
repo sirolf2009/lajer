@@ -5,7 +5,4 @@ import java.util.function.Consumer
 
 abstract class LajerCommand implements Consumer<LajerManager> {
 
-	def abstract String name()
-	def abstract String author()	
-	
 }

@@ -26,16 +26,6 @@ public abstract class LajerCommandNavigate extends LajerCommand {
         return Boolean.valueOf((((it).doubleValue() > (270 - losRange)) && ((it).doubleValue() < (270 + losRange))));
       }));
     }
-    
-    @Override
-    public String name() {
-      return "navigate-up";
-    }
-    
-    @Override
-    public String author() {
-      return "sirolf2009";
-    }
   }
   
   public static class NavigateRight extends LajerCommandNavigate {
@@ -43,16 +33,6 @@ public abstract class LajerCommandNavigate extends LajerCommand {
       super(((Function<Double, Boolean>) (Double it) -> {
         return Boolean.valueOf((((it).doubleValue() > (360 - losRange)) || ((it).doubleValue() < losRange)));
       }));
-    }
-    
-    @Override
-    public String name() {
-      return "navigate-right";
-    }
-    
-    @Override
-    public String author() {
-      return "sirolf2009";
     }
   }
   
@@ -62,16 +42,6 @@ public abstract class LajerCommandNavigate extends LajerCommand {
         return Boolean.valueOf((((it).doubleValue() > (90 - losRange)) && ((it).doubleValue() < (90 + losRange))));
       }));
     }
-    
-    @Override
-    public String name() {
-      return "navigate-down";
-    }
-    
-    @Override
-    public String author() {
-      return "sirolf2009";
-    }
   }
   
   public static class NavigateLeft extends LajerCommandNavigate {
@@ -79,16 +49,6 @@ public abstract class LajerCommandNavigate extends LajerCommand {
       super(((Function<Double, Boolean>) (Double it) -> {
         return Boolean.valueOf((((it).doubleValue() > (180 - losRange)) && ((it).doubleValue() < (180 + losRange))));
       }));
-    }
-    
-    @Override
-    public String name() {
-      return "navigate-left";
-    }
-    
-    @Override
-    public String author() {
-      return "sirolf2009";
     }
   }
   

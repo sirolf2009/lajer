@@ -15,24 +15,18 @@ abstract class LajerCommandMoveSelected extends LajerCommand {
 
 	override accept(extension LajerManager manager) {
 		if(focused !== null) {
-			val rect = layout.getConstraint(focused.node as Figure) as Rectangle
-			layout.setConstraint(focused.node as Figure, rect.translate(translation))
+			val rect = layout.getConstraint(focused.node) as Rectangle
+			val newPos = rect.translate(translation)
+			layout.setConstraint(focused.node as Figure, newPos)
 			layout.layout((focused.node as Figure).parent)
+			markAsDirty()
 		}
-	}
-
-	override author() {
-		"sirolf2009"
 	}
 
 	public static class LajerCommandMoveSelectedUp extends LajerCommandMoveSelected {
 
 		new(int amount) {
 			super(new Point(0, -amount))
-		}
-
-		override name() {
-			"move-selected-up"
 		}
 
 	}
@@ -43,10 +37,6 @@ abstract class LajerCommandMoveSelected extends LajerCommand {
 			super(new Point(amount, 0))
 		}
 
-		override name() {
-			"move-selected-right"
-		}
-
 	}
 
 	public static class LajerCommandMoveSelectedDown extends LajerCommandMoveSelected {
@@ -55,20 +45,12 @@ abstract class LajerCommandMoveSelected extends LajerCommand {
 			super(new Point(0, amount))
 		}
 
-		override name() {
-			"move-selected-down"
-		}
-
 	}
 
 	public static class LajerCommandMoveSelectedLeft extends LajerCommandMoveSelected {
 
 		new(int amount) {
 			super(new Point(-amount, 0))
-		}
-
-		override name() {
-			"move-selected-left"
 		}
 
 	}

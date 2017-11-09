@@ -21,7 +21,13 @@ class TestCalculatorModel {
 		ConnectionModel.connectTo(summer, displayer)
 		ConnectionModel.connectTo(subtractor, displayer)
 		
-		new OperationModel("com.sirolf2009.lajer.core.model.ComponentModel.TestCalculator", #[input.inputPorts.get(0)], #[], #[input, checker, summer, subtractor, displayer])
+		new OperationModel("com.sirolf2009.lajer.core.model.ComponentModel.TestCalculator", #[input.inputPorts.get(0)], #[], #[input, checker, summer, subtractor, displayer], #{
+			input -> (0->10),
+			checker -> (10->10),
+			summer -> (20->0),
+			subtractor -> (20->20),
+			displayer -> (30->10)
+		})
 	}
 
 	static class Summer extends ComponentModel {
@@ -47,7 +53,7 @@ class TestCalculatorModel {
 	static class UserInput extends ComponentModel {
 
 		new() {
-			super("com.sirolf2009.lajer.core.model.ComponentModel.TestCalculator.Summer", newArrayList(), newArrayList())
+			super("com.sirolf2009.lajer.core.model.ComponentModel.TestCalculator.UserInput", newArrayList(), newArrayList())
 			inputPorts.add(new PortModel(this, newArrayList(), newArrayList()))
 			outputPorts.add(new PortModel(this, newArrayList(), newArrayList()))
 		}

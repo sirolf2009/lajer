@@ -11,20 +11,21 @@ import com.sirolf2009.lajer.plugin.figure.NodeFigure;
 import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommand;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected;
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate;
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandRemoveSelected;
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -41,6 +42,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
+import org.eclipse.xtext.xbase.lib.Pair;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 @SuppressWarnings("all")
@@ -55,9 +57,13 @@ public class LajerManager implements KeyListener {
   
   public final static LajerCommandSelectFocused COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused();
   
+  public final static LajerCommandRemoveSelected COMMAND_REMOVE_SELECTED = new LajerCommandRemoveSelected();
+  
   public final static LajerCommandConnectSelected COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected();
   
   public final static LajerCommandDisconnectSelected COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected();
+  
+  public final static LajerCommandMarkSelectedAsInput COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput();
   
   public final static LajerCommandMoveSelected.LajerCommandMoveSelectedUp COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelected.LajerCommandMoveSelectedUp(10);
   
@@ -81,8 +87,6 @@ public class LajerManager implements KeyListener {
   
   private final Figure root;
   
-  private final Map<String, LajerCommand> commands;
-  
   private final LajerEditor editor;
   
   private final List<INodeFigure> nodes;
@@ -104,19 +108,6 @@ public class LajerManager implements KeyListener {
     this.layout = layout;
     this.root = root;
     this.editor = editor;
-    HashMap<String, LajerCommand> _hashMap = new HashMap<String, LajerCommand>();
-    this.commands = _hashMap;
-    this.register(LajerManager.COMMAND_NAVIGATE_UP);
-    this.register(LajerManager.COMMAND_NAVIGATE_DOWN);
-    this.register(LajerManager.COMMAND_NAVIGATE_LEFT);
-    this.register(LajerManager.COMMAND_NAVIGATE_RIGHT);
-    this.register(LajerManager.COMMAND_SELECT_FOCUSED);
-    this.register(LajerManager.COMMAND_CONNECT_SELECTED);
-    this.register(LajerManager.COMMAND_DISCONNECT_SELECTED);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_UP);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_DOWN);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_LEFT);
-    this.register(LajerManager.COMMAND_MOVE_SELECTED_RIGHT);
     HashSet<PortFigure> _hashSet = new HashSet<PortFigure>();
     this.selected = _hashSet;
     HashSet<PortFigure> _hashSet_1 = new HashSet<PortFigure>();
@@ -125,10 +116,6 @@ public class LajerManager implements KeyListener {
     this.outputPorts = _hashSet_2;
     ArrayList<INodeFigure> _arrayList = new ArrayList<INodeFigure>();
     this.nodes = _arrayList;
-  }
-  
-  public LajerCommand register(final LajerCommand command) {
-    return this.commands.put(command.name(), command);
   }
   
   public Figure add(final NodeModel node, final int x, final int y) {
@@ -145,8 +132,8 @@ public class LajerManager implements KeyListener {
     final Figure figure = ((Figure)_xifexpression);
     this.nodes.add(((INodeFigure) figure));
     Rectangle _rectangle = new Rectangle(x, y, (-1), (-1));
-    this.layout.setConstraint(((Figure)figure), _rectangle);
-    this.root.add(((Figure)figure));
+    this.layout.setConstraint(figure, _rectangle);
+    this.root.add(figure);
     return ((Figure)figure);
   }
   
@@ -207,6 +194,14 @@ public class LajerManager implements KeyListener {
                                 boolean _equals_1 = (e.keyCode == _charAt_1);
                                 if (_equals_1) {
                                   LajerManager.COMMAND_DISCONNECT_SELECTED.accept(this);
+                                } else {
+                                  if ((e.keyCode == SWT.DEL)) {
+                                    LajerManager.COMMAND_REMOVE_SELECTED.accept(this);
+                                  } else {
+                                    if ((this.ctrlPressed && (e.keyCode == "i".charAt(0)))) {
+                                      LajerManager.COMMAND_MARK_SELECTED_AS_INPUT.accept(this);
+                                    }
+                                  }
                                 }
                               }
                             }
@@ -248,19 +243,37 @@ public class LajerManager implements KeyListener {
       int _length_2 = ".lajer".length();
       int _minus = (_length_1 - _length_2);
       final String fullyQualifiedName = file.substring(_plus, _minus).replace("/", ".");
-      final Function1<PortFigure, PortModel> _function_1 = (PortFigure it) -> {
+      final Function1<INodeFigure, Pair<NodeModel, Pair<Integer, Integer>>> _function_1 = (INodeFigure it) -> {
+        Pair<NodeModel, Pair<Integer, Integer>> _xblockexpression = null;
+        {
+          Object _constraint = this.layout.getConstraint(it);
+          final Rectangle constraint = ((Rectangle) _constraint);
+          NodeModel _node = it.getNode();
+          Pair<Integer, Integer> _mappedTo = Pair.<Integer, Integer>of(Integer.valueOf(constraint.getTopLeft().x), Integer.valueOf(constraint.getTopLeft().y));
+          _xblockexpression = Pair.<NodeModel, Pair<Integer, Integer>>of(_node, _mappedTo);
+        }
+        return _xblockexpression;
+      };
+      final Function1<Pair<NodeModel, Pair<Integer, Integer>>, NodeModel> _function_2 = (Pair<NodeModel, Pair<Integer, Integer>> it) -> {
+        return it.getKey();
+      };
+      final Function1<Pair<NodeModel, Pair<Integer, Integer>>, Pair<Integer, Integer>> _function_3 = (Pair<NodeModel, Pair<Integer, Integer>> it) -> {
+        return it.getValue();
+      };
+      final Map<NodeModel, Pair<Integer, Integer>> positions = IterableExtensions.<Pair<NodeModel, Pair<Integer, Integer>>, NodeModel, Pair<Integer, Integer>>toMap(ListExtensions.<INodeFigure, Pair<NodeModel, Pair<Integer, Integer>>>map(this.nodes, _function_1), _function_2, _function_3);
+      final Function1<PortFigure, PortModel> _function_4 = (PortFigure it) -> {
         return it.getPort();
       };
-      List<PortModel> _list = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.inputPorts, _function_1));
-      final Function1<PortFigure, PortModel> _function_2 = (PortFigure it) -> {
+      List<PortModel> _list = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.inputPorts, _function_4));
+      final Function1<PortFigure, PortModel> _function_5 = (PortFigure it) -> {
         return it.getPort();
       };
-      List<PortModel> _list_1 = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.outputPorts, _function_2));
-      final Function1<INodeFigure, NodeModel> _function_3 = (INodeFigure it) -> {
+      List<PortModel> _list_1 = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.outputPorts, _function_5));
+      final Function1<INodeFigure, NodeModel> _function_6 = (INodeFigure it) -> {
         return it.getNode();
       };
-      List<NodeModel> _list_2 = IterableExtensions.<NodeModel>toList(ListExtensions.<INodeFigure, NodeModel>map(this.nodes, _function_3));
-      return new OperationModel(fullyQualifiedName, _list, _list_1, _list_2);
+      List<NodeModel> _list_2 = IterableExtensions.<NodeModel>toList(ListExtensions.<INodeFigure, NodeModel>map(this.nodes, _function_6));
+      return new OperationModel(fullyQualifiedName, _list, _list_1, _list_2, positions);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
@@ -309,6 +322,11 @@ public class LajerManager implements KeyListener {
     this.focused.repaint();
   }
   
+  public Rectangle getConstraint(final IFigure figure) {
+    Object _constraint = this.layout.getConstraint(figure);
+    return ((Rectangle) _constraint);
+  }
+  
   public boolean isInput(final PortFigure port) {
     return (port instanceof InputFigure);
   }
@@ -346,5 +364,13 @@ public class LajerManager implements KeyListener {
   
   public PortFigure getFocused() {
     return this.focused;
+  }
+  
+  public Set<PortFigure> getInputPorts() {
+    return this.inputPorts;
+  }
+  
+  public Set<PortFigure> getOutputPorts() {
+    return this.outputPorts;
   }
 }

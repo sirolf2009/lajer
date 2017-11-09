@@ -66,14 +66,4 @@ public class LajerCommandDisconnectSelected extends LajerCommand {
       manager.markAsDirty();
     }
   }
-  
-  @Override
-  public String name() {
-    return "disconnect-selected";
-  }
-  
-  @Override
-  public String author() {
-    return "sirolf2009";
-  }
 }

@@ -22,6 +22,8 @@ class LajerModelPersistor {
 	static val namePattern = Pattern.compile("name: (.+)")
 	static val nodesPattern = Pattern.compile("nodes: \\[(.*)\\]")
 	static val nodeDeclarationPattern = Pattern.compile('''\(([CSO]):([a-zA-Z0-9\.]+):([0-9]):([0-9])\)->([a-zA-Z0-9]+)''')
+	static val positionsPattern = Pattern.compile("positions: \\[(.*)\\]")
+	static val positionDeclarationPattern = Pattern.compile('''([a-zA-Z0-9]+)->\(([0-9]+):([0-9]+)\)''')
 	static val connectionsPattern = Pattern.compile("connections: \\[(.*)\\]")
 	static val connectionDeclarationPattern = Pattern.compile('''\(([a-zA-Z0-9]+):([0-9])\)->\(([a-zA-Z0-9]+):([0-9])\)''')
 	static val inputsPattern = Pattern.compile("inputs: \\[(.*)\\]")
@@ -42,6 +44,7 @@ class LajerModelPersistor {
 		version: 1
 		name: «operation.fullyQualifiedName»
 		nodes: [«operation.components.toSet().toList().sortInplaceBy[fullyQualifiedName].map['''(«typeID(it)»:«fullyQualifiedName»:«inputPorts.size()»:«outputPorts.size()»)->«ctx.getVariableName(it)»'''].join(",")»]
+		positions: [«operation.positions.entrySet().toList().sortInplaceBy[key.fullyQualifiedName].map['''«ctx.getVariableName(key)»->(«value.key»:«value.value»)'''].join(",")»]
 		connections: [«operation.connections.toList().sortInplaceBy[from.component.fullyQualifiedName].map[
 			return '''«ctx.asConnectionFromIdentifier(from)»->«ctx.asConnectionToIdentifier(to)»'''
 		].join(",")»]
@@ -88,11 +91,17 @@ class LajerModelPersistor {
 				} else if(get(0) == "S") {
 					new SplitterModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()))
 				} else if(get(0) == "O") {
-					new OperationModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()), new ArrayList())
+					new OperationModel(get(1), new ArrayList(get(2).asInt()), new ArrayList(get(3).asInt()), new ArrayList(), new HashMap())
 				}
 			(0 ..< get(2).asInt()).forEach[node.inputPorts.add(new PortModel(node, new ArrayList(), new ArrayList()))]
 			(0 ..< get(3).asInt()).forEach[node.outputPorts.add(new PortModel(node, new ArrayList(), new ArrayList()))]
 			nodes.put(get(4), node)
+		]
+		val positions = new HashMap<NodeModel, Pair<Integer, Integer>>()
+		val positionsTag = model.findOne(positionsPattern)
+		positionsTag.findZeroOrMoreGroups(positionDeclarationPattern, 3).forEach[
+			val node = nodes.get(get(0))
+			positions.put(node, get(1).asInt() -> get(2).asInt())
 		]
 		val connectionsTag = model.findOne(connectionsPattern)
 		connectionsTag.findZeroOrMoreGroups(connectionDeclarationPattern, 4).forEach [
@@ -110,7 +119,7 @@ class LajerModelPersistor {
 		val outputs = outputsTag.findZeroOrMoreGroups(portDeclarationPattern, 2).map [
 			nodes.get(get(0)).outputPorts.get(get(1).asInt())
 		].toList()
-		return new OperationModel(name, inputs, outputs, nodes.values().toList())
+		return new OperationModel(name, inputs, outputs, nodes.values().toList(), positions)
 	}
 
 	def static findOne(String model, Pattern pattern) {

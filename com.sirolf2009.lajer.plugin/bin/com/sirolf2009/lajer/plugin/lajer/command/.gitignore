@@ -5,3 +5,7 @@
 /.LajerCommandMoveSelected.java._trace
 /.LajerCommandNavigate.java._trace
 /.LajerCommandSelectFocused.java._trace
+/.LajerCommandKill.java._trace
+/.LajerCommandKillSelected.java._trace
+/.LajerCommandRemoveSelected.java._trace
+/.LajerCommandMarkSelectedAsInput.java._trace

@@ -10,7 +10,7 @@ import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.ToolbarLayout
 
 class NodeFigure extends Figure implements INodeFigure {
-	
+
 	val NodeModel node
 	val List<InputFigure> inputFigures
 	val List<OutputFigure> outputFigures
@@ -20,15 +20,21 @@ class NodeFigure extends Figure implements INodeFigure {
 		layoutManager = new ToolbarLayout(true) => [
 			stretchMinorAxis = true
 		]
+		opaque = true
 		
 		inputFigures = new ArrayList()
 		add(new Figure() => [
 			layoutManager = new ToolbarLayout(false) => [
 				minorAlignment = ToolbarLayout.ALIGN_CENTER
 			]
-			node.inputPorts.forEach[
-				add(new InputFigure(this, it, manager) => [
-					inputFigures.add(it)
+			node.inputPorts.forEach [ port |
+				add(new Figure() => [
+					layoutManager = new ToolbarLayout(true) => [
+						minorAlignment = ToolbarLayout.ALIGN_CENTER
+					]
+					add(new InputFigure(this, port, manager) => [
+						inputFigures.add(it)
+					])
 				])
 			]
 		])
@@ -40,22 +46,27 @@ class NodeFigure extends Figure implements INodeFigure {
 			layoutManager = new ToolbarLayout(false) => [
 				minorAlignment = ToolbarLayout.ALIGN_CENTER
 			]
-			node.outputPorts.forEach[
-				add(new OutputFigure(this, it, manager) => [
-					outputFigures.add(it)
+			node.outputPorts.forEach [ port |
+				add(new Figure() => [
+					layoutManager = new ToolbarLayout(true) => [
+						minorAlignment = ToolbarLayout.ALIGN_CENTER
+					]
+					add(new OutputFigure(this, port, manager) => [
+						outputFigures.add(it)
+					])
 				])
 			]
 		])
 	}
-	
+
 	override getNode() {
 		return node
 	}
-	
+
 	override getInputFigures() {
 		return inputFigures
 	}
-	
+
 	override getOutputFigures() {
 		return outputFigures
 	}

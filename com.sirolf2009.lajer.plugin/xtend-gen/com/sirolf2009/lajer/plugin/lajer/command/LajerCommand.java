@@ -5,7 +5,4 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("all")
 public abstract class LajerCommand implements Consumer<LajerManager> {
-  public abstract String name();
-  
-  public abstract String author();
 }

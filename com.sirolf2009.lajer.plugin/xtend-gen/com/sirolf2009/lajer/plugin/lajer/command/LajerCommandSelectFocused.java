@@ -25,14 +25,4 @@ public class LajerCommandSelectFocused extends LajerCommand {
       manager.getFocused().repaint();
     }
   }
-  
-  @Override
-  public String name() {
-    return "select-focused";
-  }
-  
-  @Override
-  public String author() {
-    return "sirolf2009";
-  }
 }

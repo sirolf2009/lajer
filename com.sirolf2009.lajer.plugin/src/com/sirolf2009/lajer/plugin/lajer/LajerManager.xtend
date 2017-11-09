@@ -10,9 +10,9 @@ import com.sirolf2009.lajer.plugin.figure.NodeFigure
 import com.sirolf2009.lajer.plugin.figure.OutputFigure
 import com.sirolf2009.lajer.plugin.figure.PortFigure
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommand
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedLeft
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedRight
@@ -21,14 +21,14 @@ import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateDo
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateLeft
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateRight
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateUp
+import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandRemoveSelected
 import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused
 import java.util.ArrayList
-import java.util.HashMap
 import java.util.HashSet
 import java.util.List
-import java.util.Map
 import java.util.Set
 import org.eclipse.draw2d.Figure
+import org.eclipse.draw2d.IFigure
 import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.XYLayout
 import org.eclipse.draw2d.geometry.Rectangle
@@ -45,8 +45,10 @@ class LajerManager implements KeyListener {
 	public static val COMMAND_NAVIGATE_LEFT = new NavigateLeft(45)
 	public static val COMMAND_NAVIGATE_RIGHT = new NavigateRight(45)
 	public static val COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused()
+	public static val COMMAND_REMOVE_SELECTED = new LajerCommandRemoveSelected()
 	public static val COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected()
 	public static val COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected()
+	public static val COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput()
 	public static val COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelectedUp(10)
 	public static val COMMAND_MOVE_SELECTED_DOWN = new LajerCommandMoveSelectedDown(10)
 	public static val COMMAND_MOVE_SELECTED_LEFT = new LajerCommandMoveSelectedLeft(10)
@@ -59,7 +61,6 @@ class LajerManager implements KeyListener {
 	val Canvas canvas
 	val XYLayout layout
 	val Figure root
-	val Map<String, LajerCommand> commands
 	val LajerEditor editor
 	val List<INodeFigure> nodes
 	val Set<PortFigure> selected
@@ -74,26 +75,10 @@ class LajerManager implements KeyListener {
 		this.layout = layout
 		this.root = root
 		this.editor = editor
-		commands = new HashMap()
-		COMMAND_NAVIGATE_UP.register()
-		COMMAND_NAVIGATE_DOWN.register()
-		COMMAND_NAVIGATE_LEFT.register()
-		COMMAND_NAVIGATE_RIGHT.register()
-		COMMAND_SELECT_FOCUSED.register()
-		COMMAND_CONNECT_SELECTED.register()
-		COMMAND_DISCONNECT_SELECTED.register()
-		COMMAND_MOVE_SELECTED_UP.register()
-		COMMAND_MOVE_SELECTED_DOWN.register()
-		COMMAND_MOVE_SELECTED_LEFT.register()
-		COMMAND_MOVE_SELECTED_RIGHT.register()
 		selected = new HashSet()
 		inputPorts = new HashSet()
 		outputPorts = new HashSet()
 		nodes = new ArrayList()
-	}
-
-	def register(LajerCommand command) {
-		commands.put(command.name, command)
 	}
 
 	def add(NodeModel node, int x, int y) {
@@ -144,6 +129,10 @@ class LajerManager implements KeyListener {
 			COMMAND_CONNECT_SELECTED.accept(this)
 		} else if(e.keyCode == 'd'.charAt(0)) {
 			COMMAND_DISCONNECT_SELECTED.accept(this)
+		} else if(e.keyCode == SWT.DEL) {
+			COMMAND_REMOVE_SELECTED.accept(this)
+		} else if(ctrlPressed && e.keyCode == 'i'.charAt(0)) {
+			COMMAND_MARK_SELECTED_AS_INPUT.accept(this)
 		}
 	}
 
@@ -157,7 +146,11 @@ class LajerManager implements KeyListener {
 			file.startsWith(path.makeAbsolute.toString())
 		].get(0)
 		val fullyQualifiedName = file.substring(folder.path.makeAbsolute.toString().length + 1, file.length - ".lajer".length).replace("/", ".")
-		return new OperationModel(fullyQualifiedName, inputPorts.map[port].toList(), outputPorts.map[port].toList(), nodes.map[node].toList())
+		val positions = nodes.map[
+			val constraint = layout.getConstraint(it) as Rectangle
+			node -> (constraint.topLeft.x -> constraint.topLeft.y)
+		].toMap([key], [value])
+		return new OperationModel(fullyQualifiedName, inputPorts.map[port].toList(), outputPorts.map[port].toList(), nodes.map[node].toList(), positions)
 	}
 
 	def focusOnFirst() {
@@ -187,6 +180,10 @@ class LajerManager implements KeyListener {
 		focused = port
 		focused.focused = true
 		focused.repaint()
+	}
+	
+	def getConstraint(IFigure figure) {
+		return layout.getConstraint(figure) as Rectangle
 	}
 
 	def isInput(PortFigure port) {
@@ -223,6 +220,14 @@ class LajerManager implements KeyListener {
 
 	def getFocused() {
 		return focused
+	}
+	
+	def getInputPorts() {
+		return inputPorts
+	}
+	
+	def getOutputPorts() {
+		return outputPorts
 	}
 
 }

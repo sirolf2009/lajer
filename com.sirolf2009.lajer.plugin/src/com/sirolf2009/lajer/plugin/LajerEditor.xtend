@@ -38,6 +38,9 @@ import org.eclipse.ui.IEditorSite
 import org.eclipse.ui.PartInitException
 import org.eclipse.ui.part.EditorPart
 import org.eclipse.ui.part.FileEditorInput
+import com.sirolf2009.lajer.plugin.figure.OperationInputFigure
+import org.eclipse.draw2d.geometry.Rectangle
+import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure
 
 class LajerEditor extends EditorPart {
 
@@ -51,13 +54,13 @@ class LajerEditor extends EditorPart {
 		if(input instanceof FileEditorInput) {
 			this.input = input
 			val in = new BufferedReader(new InputStreamReader(input.file.contents))
-			val contents = in.lines.reduce[a,b|a+b]
+			val contents = in.lines.reduce[a, b|a + b]
 			in.close()
 			inputFile = contents.map[LajerModelPersistor.parseModel(it)]
 		} else {
 			throw new IllegalArgumentException("Invalid input " + input)
 		}
-	}	
+	}
 
 	override createPartControl(Composite parent) {
 		new Canvas(parent, SWT.NONE) => [
@@ -68,13 +71,26 @@ class LajerEditor extends EditorPart {
 
 			manager = new LajerManager(it, contentsLayout, contents, this)
 			addKeyListener(manager)
-			
-			inputFile.ifPresent[
-				components.forEach[manager.add(it, 10, 10)]
-				connections.forEach[connection|
+
+			inputFile.ifPresent [
+				components.forEach[node|manager.add(node, positions.get(node).key, positions.get(node).value)]
+				connections.forEach [ connection |
 					val from = manager.nodes.flatMap[outputFigures.filter[port === connection.from]].get(0)
 					val to = manager.nodes.flatMap[inputFigures.filter[port === connection.to]].get(0)
 					manager.root.add(new ConnectionFigure(to, from))
+				]
+				inputPorts.forEach [inputPort|
+					val portFigure = manager.nodes.flatMap[inputFigures.filter[port === inputPort]].get(0)
+					val operationInputFigure = new OperationInputFigure()
+					val rectOrigin = manager.getConstraint(portFigure.node)
+					contents.add(operationInputFigure, new Rectangle(rectOrigin.center.x - 80, rectOrigin.center.y, -1, -1))
+					val connection = new OriginConnectionFigure(operationInputFigure, portFigure)
+					contents.add(connection)
+					manager.inputPorts.add(portFigure)
+					portFigure.node.addFigureListener [
+						val rect = manager.getConstraint(portFigure)
+						contentsLayout.setConstraint(operationInputFigure, new Rectangle(rect.center.x - 80, rect.center.y, -1, -1))
+					]
 				]
 			]
 
@@ -98,18 +114,18 @@ class LajerEditor extends EditorPart {
 
 				override drop(DropTargetEvent event) {
 					val files = event.data as String[]
-					files.forEach[
+					files.forEach [
 						val file = ResourcesPlugin.workspace.root.getFileForLocation(Path.fromPortableString(it))
 						val javaFile = JavaCore.create(file)
 						val project = JavaCore.create(file.project)
 						val package = javaFile.parent as PackageFragment
-						val type = project.findType(package.names.join(".")+"."+javaFile.elementName.replace(".java", ""))
+						val type = project.findType(package.names.join(".") + "." + javaFile.elementName.replace(".java", ""))
 						val nodeType = type.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter")].get(0)
 						val exposed = type.methods.filter[!annotations.filter[elementName.equals("Expose")].empty].toList()
-						
+
 						if(nodeType.elementName.equals("Component")) {
 							val model = new ComponentModel(type.fullyQualifiedName, new ArrayList(), new ArrayList())
-							exposed.map[new PortModel(model, new ArrayList(), new ArrayList())].forEach[
+							exposed.map[new PortModel(model, new ArrayList(), new ArrayList())].forEach [
 								model.inputPorts.add(it)
 								model.outputPorts.add(it)
 							]
@@ -143,7 +159,7 @@ class LajerEditor extends EditorPart {
 	override doSave(IProgressMonitor monitor) {
 		monitor.beginTask("Saving", 2)
 		monitor.subTask("Saving")
-		//TODO unify the persistence methods. This is cancer
+		// TODO unify the persistence methods. This is cancer
 		LajerModelPersistor.persistModel(manager.asOperation(), Paths.get(editorInput.path.toString).toFile())
 		monitor.worked(1)
 		monitor.subTask("Compiling")
@@ -171,9 +187,9 @@ class LajerEditor extends EditorPart {
 	override FileEditorInput getEditorInput() {
 		super.getEditorInput() as FileEditorInput
 	}
-	
+
 	override getPartName() {
 		return editorInput.file.name
 	}
-	
+
 }
