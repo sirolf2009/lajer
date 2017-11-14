@@ -152,7 +152,7 @@ public class LajerManager {
     }
   }
   
-  public void markAsInput(final InputFigure input) {
+  public OriginConnectionFigure markAsInput(final InputFigure input) {
     final OperationInputFigure operationInputFigure = new OperationInputFigure();
     this.root.add(operationInputFigure);
     final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, input);
@@ -163,9 +163,10 @@ public class LajerManager {
       this.layout.setConstraint(operationInputFigure, _rectangle);
     };
     input.addFigureListener(_function);
+    return connection;
   }
   
-  public void markAsOutput(final OutputFigure output) {
+  public CallbackConnectionFigure markAsOutput(final OutputFigure output) {
     final OperationOutputFigure operationOutputFigure = new OperationOutputFigure();
     this.root.add(operationOutputFigure);
     final CallbackConnectionFigure connection = new CallbackConnectionFigure(output, operationOutputFigure);
@@ -176,6 +177,7 @@ public class LajerManager {
       this.layout.setConstraint(operationOutputFigure, _rectangle);
     };
     output.addFigureListener(_function);
+    return connection;
   }
   
   public void focusOnFirst() {

@@ -87,6 +87,7 @@ class LajerManager {
 		input.addFigureListener [
 			layout.setConstraint(operationInputFigure, new Rectangle(input.bounds.center.x - 80, input.bounds.center.y - 10, -1, -1))
 		]
+		return connection
 	}
 
 	def markAsOutput(OutputFigure output) {
@@ -98,6 +99,7 @@ class LajerManager {
 		output.addFigureListener [
 			layout.setConstraint(operationOutputFigure, new Rectangle(output.bounds.center.x + 80, output.bounds.center.y - 10, -1, -1))
 		]
+		return connection
 	}
 
 	def focusOnFirst() {
