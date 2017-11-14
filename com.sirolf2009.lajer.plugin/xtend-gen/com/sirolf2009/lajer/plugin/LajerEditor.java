@@ -80,27 +80,12 @@ public class LajerEditor extends EditorPart {
   
   @Override
   public void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
-    try {
-      this.setSite(site);
-      if ((input instanceof FileEditorInput)) {
-        this.setInput(input);
-        InputStream _contents = ((FileEditorInput)input).getFile().getContents();
-        InputStreamReader _inputStreamReader = new InputStreamReader(_contents);
-        final BufferedReader in = new BufferedReader(_inputStreamReader);
-        final BinaryOperator<String> _function = (String a, String b) -> {
-          return (a + b);
-        };
-        final Optional<String> contents = in.lines().reduce(_function);
-        in.close();
-        final Function<String, OperationModel> _function_1 = (String it) -> {
-          return LajerModelPersistor.parseModel(it);
-        };
-        this.inputFile = contents.<OperationModel>map(_function_1);
-      } else {
-        throw new IllegalArgumentException(("Invalid input " + input));
-      }
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
+    this.setSite(site);
+    if ((input instanceof FileEditorInput)) {
+      this.setInput(input);
+      this.inputFile = this.load(((FileEditorInput)input).getFile());
+    } else {
+      throw new IllegalArgumentException(("Invalid input " + input));
     }
   }
   
@@ -220,7 +205,7 @@ public class LajerEditor extends EditorPart {
               NullProgressMonitor _nullProgressMonitor = new NullProgressMonitor();
               _openable.open(_nullProgressMonitor);
               final Function1<IAnnotation, Boolean> _function_1 = (IAnnotation it_2) -> {
-                return Boolean.valueOf((it_2.getElementName().equals("Component") || it_2.getElementName().equals("Splitter")));
+                return Boolean.valueOf(((it_2.getElementName().equals("Component") || it_2.getElementName().equals("Splitter")) || it_2.getElementName().equals("Operation")));
               };
               final IAnnotation nodeType = ((IAnnotation[])Conversions.unwrapArray(IterableExtensions.<IAnnotation>filter(((Iterable<IAnnotation>)Conversions.doWrapArray(type.getAnnotations())), _function_1), IAnnotation.class))[0];
               final Function1<IMethod, Boolean> _function_2 = (IMethod it_2) -> {
@@ -253,29 +238,38 @@ public class LajerEditor extends EditorPart {
                 ListExtensions.<IMethod, PortModel>map(exposed, _function_3).forEach(_function_4);
                 LajerEditor.this.manager.add(model, 10, 10);
               } else {
-                String _fullyQualifiedName_1 = type.getFullyQualifiedName();
-                ArrayList<PortModel> _arrayList_2 = new ArrayList<PortModel>();
-                ArrayList<PortModel> _arrayList_3 = new ArrayList<PortModel>();
-                final SplitterModel model_1 = new SplitterModel(_fullyQualifiedName_1, _arrayList_2, _arrayList_3);
-                int _size = exposed.size();
-                boolean _equals_1 = (_size == 1);
+                boolean _equals_1 = nodeType.getElementName().equals("Splitter");
                 if (_equals_1) {
-                  ArrayList<ConnectionModel> _arrayList_4 = new ArrayList<ConnectionModel>();
-                  ArrayList<ConnectionModel> _arrayList_5 = new ArrayList<ConnectionModel>();
-                  PortModel _portModel = new PortModel(model_1, _arrayList_4, _arrayList_5);
-                  model_1.getInputPorts().add(_portModel);
-                  ArrayList<ConnectionModel> _arrayList_6 = new ArrayList<ConnectionModel>();
-                  ArrayList<ConnectionModel> _arrayList_7 = new ArrayList<ConnectionModel>();
-                  PortModel _portModel_1 = new PortModel(model_1, _arrayList_6, _arrayList_7);
-                  model_1.getOutputPorts().add(_portModel_1);
-                  ArrayList<ConnectionModel> _arrayList_8 = new ArrayList<ConnectionModel>();
-                  ArrayList<ConnectionModel> _arrayList_9 = new ArrayList<ConnectionModel>();
-                  PortModel _portModel_2 = new PortModel(model_1, _arrayList_8, _arrayList_9);
-                  model_1.getOutputPorts().add(_portModel_2);
+                  String _fullyQualifiedName_1 = type.getFullyQualifiedName();
+                  ArrayList<PortModel> _arrayList_2 = new ArrayList<PortModel>();
+                  ArrayList<PortModel> _arrayList_3 = new ArrayList<PortModel>();
+                  final SplitterModel model_1 = new SplitterModel(_fullyQualifiedName_1, _arrayList_2, _arrayList_3);
+                  int _size = exposed.size();
+                  boolean _equals_2 = (_size == 1);
+                  if (_equals_2) {
+                    ArrayList<ConnectionModel> _arrayList_4 = new ArrayList<ConnectionModel>();
+                    ArrayList<ConnectionModel> _arrayList_5 = new ArrayList<ConnectionModel>();
+                    PortModel _portModel = new PortModel(model_1, _arrayList_4, _arrayList_5);
+                    model_1.getInputPorts().add(_portModel);
+                    ArrayList<ConnectionModel> _arrayList_6 = new ArrayList<ConnectionModel>();
+                    ArrayList<ConnectionModel> _arrayList_7 = new ArrayList<ConnectionModel>();
+                    PortModel _portModel_1 = new PortModel(model_1, _arrayList_6, _arrayList_7);
+                    model_1.getOutputPorts().add(_portModel_1);
+                    ArrayList<ConnectionModel> _arrayList_8 = new ArrayList<ConnectionModel>();
+                    ArrayList<ConnectionModel> _arrayList_9 = new ArrayList<ConnectionModel>();
+                    PortModel _portModel_2 = new PortModel(model_1, _arrayList_8, _arrayList_9);
+                    model_1.getOutputPorts().add(_portModel_2);
+                  } else {
+                    throw new RuntimeException("Only one method may be exposed for a splitter");
+                  }
+                  LajerEditor.this.manager.add(model_1, 10, 10);
                 } else {
-                  throw new RuntimeException("Only one method may be exposed for a splitter");
+                  final IFile lajerFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromPortableString(it_1.replace(".java", ".lajer")));
+                  final Consumer<OperationModel> _function_5 = (OperationModel it_2) -> {
+                    LajerEditor.this.manager.add(it_2, 10, 10);
+                  };
+                  LajerEditor.this.load(lajerFile).ifPresent(_function_5);
                 }
-                LajerEditor.this.manager.add(model_1, 10, 10);
               }
               LajerEditor.this.markAsDirty();
             } catch (Throwable _e) {
@@ -297,6 +291,25 @@ public class LajerEditor extends EditorPart {
   public void setFocus() {
     if (this.canvas!=null) {
       this.canvas.setFocus();
+    }
+  }
+  
+  public Optional<OperationModel> load(final IFile file) {
+    try {
+      InputStream _contents = file.getContents();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_contents);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      final BinaryOperator<String> _function = (String a, String b) -> {
+        return (a + b);
+      };
+      final Optional<String> contents = in.lines().reduce(_function);
+      in.close();
+      final Function<String, OperationModel> _function_1 = (String it) -> {
+        return LajerModelPersistor.parseModel(it);
+      };
+      return contents.<OperationModel>map(_function_1);
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
   }
   
@@ -330,7 +343,7 @@ public class LajerEditor extends EditorPart {
   
   @Override
   public boolean isDirty() {
-    return this.dirty;
+    return true;
   }
   
   @Override

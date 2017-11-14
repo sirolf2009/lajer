@@ -15,6 +15,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 import java.util.ArrayList
 import java.util.Optional
+import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IResource
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IProgressMonitor
@@ -50,10 +51,7 @@ class LajerEditor extends EditorPart {
 		this.site = site
 		if(input instanceof FileEditorInput) {
 			this.input = input
-			val in = new BufferedReader(new InputStreamReader(input.file.contents))
-			val contents = in.lines.reduce[a, b|a + b]
-			in.close()
-			inputFile = contents.map[LajerModelPersistor.parseModel(it)]
+			inputFile = input.file.load() 
 		} else {
 			throw new IllegalArgumentException("Invalid input " + input)
 		}
@@ -117,7 +115,7 @@ class LajerEditor extends EditorPart {
 						val package = javaFile.parent as PackageFragment
 						val type = project.findType(package.names.join(".") + "." + javaFile.elementName.replace(".java", ""))
 						javaFile.openable.open(new NullProgressMonitor)
-						val nodeType = type.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter")].get(0)
+						val nodeType = type.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter") || elementName.equals("Operation")].get(0)
 						val exposed = type.methods.filter[!annotations.filter[elementName.equals("Expose")].empty].toList()
 
 						if(nodeType.elementName.equals("Component")) {
@@ -127,7 +125,7 @@ class LajerEditor extends EditorPart {
 								model.outputPorts.add(it)
 							]
 							manager.add(model, 10, 10)
-						} else {
+						} else if(nodeType.elementName.equals("Splitter")) {
 							val model = new SplitterModel(type.fullyQualifiedName, new ArrayList(), new ArrayList())
 							if(exposed.size() == 1) {
 								model.inputPorts.add(new PortModel(model, new ArrayList(), new ArrayList()))
@@ -137,6 +135,11 @@ class LajerEditor extends EditorPart {
 								throw new RuntimeException("Only one method may be exposed for a splitter")
 							}
 							manager.add(model, 10, 10)
+						} else {
+							val lajerFile = ResourcesPlugin.workspace.root.getFileForLocation(Path.fromPortableString(it.replace(".java", ".lajer")))
+							lajerFile.load().ifPresent[
+								manager.add(it, 10, 10)
+							]
 						}
 						markAsDirty()
 					]
@@ -151,6 +154,13 @@ class LajerEditor extends EditorPart {
 
 	override setFocus() {
 		canvas?.setFocus()
+	}
+	
+	def load(IFile file) {
+		val in = new BufferedReader(new InputStreamReader(file.contents))
+		val contents = in.lines.reduce[a, b|a + b]
+		in.close()
+		return contents.map[LajerModelPersistor.parseModel(it)]
 	}
 
 	override doSave(IProgressMonitor monitor) {
@@ -174,7 +184,7 @@ class LajerEditor extends EditorPart {
 	}
 
 	override isDirty() {
-		return dirty
+		return true
 	}
 
 	override isSaveAsAllowed() {

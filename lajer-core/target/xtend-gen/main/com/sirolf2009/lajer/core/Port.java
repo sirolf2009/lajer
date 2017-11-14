@@ -30,7 +30,6 @@ public abstract class Port implements Function<List<Object>, Object> {
   @Override
   @Pure
   public int hashCode() {
-    final int prime = 31;
     int result = 1;
     return result;
   }
@@ -44,7 +43,6 @@ public abstract class Port implements Function<List<Object>, Object> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    Port other = (Port) obj;
     return true;
   }
   

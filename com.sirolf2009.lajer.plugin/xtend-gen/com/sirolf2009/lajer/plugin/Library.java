@@ -134,7 +134,7 @@ public class Library extends ViewPart implements IPartListener {
         final Function1<IType, Boolean> _function_2 = (IType it) -> {
           try {
             final Function1<IAnnotation, Boolean> _function_3 = (IAnnotation it_1) -> {
-              return Boolean.valueOf((it_1.getElementName().equals("Component") || it_1.getElementName().equals("Splitter")));
+              return Boolean.valueOf(((it_1.getElementName().equals("Component") || it_1.getElementName().equals("Splitter")) || it_1.getElementName().equals("Operation")));
             };
             int _size = IterableExtensions.size(IterableExtensions.<IAnnotation>filter(((Iterable<IAnnotation>)Conversions.doWrapArray(it.getAnnotations())), _function_3));
             return Boolean.valueOf((_size > 0));

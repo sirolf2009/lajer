@@ -24,14 +24,23 @@ public class Operation extends Node {
   private final List<Port> outputPorts;
   
   public Set<Connection> getConnections() {
-    final Function<Node, Stream<Connection>> _function = (Node it) -> {
-      final Function<Port, Stream<Connection>> _function_1 = (Port it_1) -> {
-        return it_1.getIncomingConnections().stream();
-      };
-      final Function<Port, Stream<Connection>> _function_2 = (Port it_1) -> {
-        return it_1.getOutgoingConnections().stream();
-      };
-      return Stream.<Connection>concat(it.getInputPorts().stream().<Connection>flatMap(_function_1), it.getOutputPorts().stream().<Connection>flatMap(_function_2));
+    final Function<Node, Stream<Connection>> _function = new Function<Node, Stream<Connection>>() {
+      @Override
+      public Stream<Connection> apply(final Node it) {
+        final Function<Port, Stream<Connection>> _function = new Function<Port, Stream<Connection>>() {
+          @Override
+          public Stream<Connection> apply(final Port it) {
+            return it.getIncomingConnections().stream();
+          }
+        };
+        final Function<Port, Stream<Connection>> _function_1 = new Function<Port, Stream<Connection>>() {
+          @Override
+          public Stream<Connection> apply(final Port it) {
+            return it.getOutgoingConnections().stream();
+          }
+        };
+        return Stream.<Connection>concat(it.getInputPorts().stream().<Connection>flatMap(_function), it.getOutputPorts().stream().<Connection>flatMap(_function_1));
+      }
     };
     return this.components.stream().<Connection>flatMap(_function).collect(Collectors.<Connection>toSet());
   }
@@ -48,7 +57,7 @@ public class Operation extends Node {
   @Pure
   public int hashCode() {
     final int prime = 31;
-    int result = super.hashCode();
+    int result = 1;
     result = prime * result + ((this.fullyQualifiedName== null) ? 0 : this.fullyQualifiedName.hashCode());
     result = prime * result + ((this.components== null) ? 0 : this.components.hashCode());
     result = prime * result + ((this.inputPorts== null) ? 0 : this.inputPorts.hashCode());
@@ -64,8 +73,6 @@ public class Operation extends Node {
     if (obj == null)
       return false;
     if (getClass() != obj.getClass())
-      return false;
-    if (!super.equals(obj))
       return false;
     Operation other = (Operation) obj;
     if (this.fullyQualifiedName == null) {

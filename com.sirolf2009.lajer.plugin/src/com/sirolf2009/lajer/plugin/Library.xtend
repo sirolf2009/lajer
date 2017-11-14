@@ -67,7 +67,7 @@ class Library extends ViewPart implements IPartListener {
 			kind == IPackageFragmentRoot.K_SOURCE
 		].flatMap [
 			compilationUnits.flatMap[allTypes.toList()]
-		].filter[it.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter")].size() > 0]
+		].filter[it.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter") || elementName.equals("Operation")].size() > 0]
 	}
 
 	def getProject() {
