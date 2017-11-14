@@ -26,3 +26,6 @@
 /LajerCommandRemoveSelected.java
 /LajerCommandSelectFocused.java
 /.LajerCommandMarkSelectedAsOutput.java._trace
+/.LajerCommandMarkSelectedAsOutput.xtendbin
+/LajerCommandMarkSelectedAsOutput.java
+/.LajerCommandActivateFocused.java._trace

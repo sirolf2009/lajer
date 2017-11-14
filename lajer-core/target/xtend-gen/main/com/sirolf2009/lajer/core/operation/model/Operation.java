@@ -48,7 +48,7 @@ public class Operation extends Node {
   @Pure
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
+    int result = super.hashCode();
     result = prime * result + ((this.fullyQualifiedName== null) ? 0 : this.fullyQualifiedName.hashCode());
     result = prime * result + ((this.components== null) ? 0 : this.components.hashCode());
     result = prime * result + ((this.inputPorts== null) ? 0 : this.inputPorts.hashCode());
@@ -64,6 +64,8 @@ public class Operation extends Node {
     if (obj == null)
       return false;
     if (getClass() != obj.getClass())
+      return false;
+    if (!super.equals(obj))
       return false;
     Operation other = (Operation) obj;
     if (this.fullyQualifiedName == null) {

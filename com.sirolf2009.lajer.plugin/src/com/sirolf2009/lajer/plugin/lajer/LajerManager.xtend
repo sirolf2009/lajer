@@ -4,26 +4,16 @@ import com.sirolf2009.lajer.core.model.NodeModel
 import com.sirolf2009.lajer.core.model.OperationModel
 import com.sirolf2009.lajer.core.model.SplitterModel
 import com.sirolf2009.lajer.plugin.LajerEditor
+import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure
 import com.sirolf2009.lajer.plugin.figure.INodeFigure
 import com.sirolf2009.lajer.plugin.figure.InputFigure
 import com.sirolf2009.lajer.plugin.figure.NodeFigure
+import com.sirolf2009.lajer.plugin.figure.OperationInputFigure
+import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure
+import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure
 import com.sirolf2009.lajer.plugin.figure.OutputFigure
 import com.sirolf2009.lajer.plugin.figure.PortFigure
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsOutput
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedDown
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedLeft
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedRight
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected.LajerCommandMoveSelectedUp
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateDown
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateLeft
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateRight
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate.NavigateUp
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandRemoveSelected
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
@@ -34,31 +24,9 @@ import org.eclipse.draw2d.Label
 import org.eclipse.draw2d.XYLayout
 import org.eclipse.draw2d.geometry.Rectangle
 import org.eclipse.jdt.core.JavaCore
-import org.eclipse.swt.SWT
-import org.eclipse.swt.events.KeyEvent
-import org.eclipse.swt.events.KeyListener
 import org.eclipse.swt.widgets.Canvas
 
-class LajerManager implements KeyListener {
-
-	public static val COMMAND_NAVIGATE_UP = new NavigateUp(45)
-	public static val COMMAND_NAVIGATE_DOWN = new NavigateDown(45)
-	public static val COMMAND_NAVIGATE_LEFT = new NavigateLeft(45)
-	public static val COMMAND_NAVIGATE_RIGHT = new NavigateRight(45)
-	public static val COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused()
-	public static val COMMAND_REMOVE_SELECTED = new LajerCommandRemoveSelected()
-	public static val COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected()
-	public static val COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected()
-	public static val COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput()
-	public static val COMMAND_MARK_SELECTED_AS_OUTPUT = new LajerCommandMarkSelectedAsOutput()
-	public static val COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelectedUp(10)
-	public static val COMMAND_MOVE_SELECTED_DOWN = new LajerCommandMoveSelectedDown(10)
-	public static val COMMAND_MOVE_SELECTED_LEFT = new LajerCommandMoveSelectedLeft(10)
-	public static val COMMAND_MOVE_SELECTED_RIGHT = new LajerCommandMoveSelectedRight(10)
-	public static val COMMAND_MOVE_SELECTED_UP_PRECISE = new LajerCommandMoveSelectedUp(1)
-	public static val COMMAND_MOVE_SELECTED_DOWN_PRECISE = new LajerCommandMoveSelectedDown(1)
-	public static val COMMAND_MOVE_SELECTED_LEFT_PRECISE = new LajerCommandMoveSelectedLeft(1)
-	public static val COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelectedRight(1)
+class LajerManager {
 
 	val Canvas canvas
 	val XYLayout layout
@@ -66,12 +34,9 @@ class LajerManager implements KeyListener {
 	val LajerEditor editor
 	val List<INodeFigure> nodes
 	val Set<PortFigure> selected
-	val Set<PortFigure> inputPorts
-	val Set<PortFigure> outputPorts
+	val Set<InputFigure> inputPorts
+	val Set<OutputFigure> outputPorts
 	var PortFigure focused
-	var boolean ctrlPressed = false
-	var boolean shiftPressed = false
-	var boolean altPressed = false
 
 	new(Canvas canvas, XYLayout layout, Figure root, LajerEditor editor) {
 		this.canvas = canvas
@@ -96,53 +61,6 @@ class LajerManager implements KeyListener {
 		return figure
 	}
 
-	override keyPressed(KeyEvent e) {
-		if(e.keyCode == SWT.CTRL) {
-			ctrlPressed = true
-		} else if(e.keyCode == SWT.SHIFT) {
-			shiftPressed = true
-		} else if(e.keyCode == SWT.ALT) {
-			altPressed = true
-		}
-		if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_UP) {
-			COMMAND_MOVE_SELECTED_UP_PRECISE.accept(this)
-		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_DOWN) {
-			COMMAND_MOVE_SELECTED_DOWN_PRECISE.accept(this)
-		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_LEFT) {
-			COMMAND_MOVE_SELECTED_LEFT_PRECISE.accept(this)
-		} else if(ctrlPressed && shiftPressed && e.keyCode == SWT.ARROW_RIGHT) {
-			COMMAND_MOVE_SELECTED_RIGHT_PRECISE.accept(this)
-		} else if(shiftPressed && e.keyCode == SWT.ARROW_UP) {
-			COMMAND_MOVE_SELECTED_UP.accept(this)
-		} else if(shiftPressed && e.keyCode == SWT.ARROW_DOWN) {
-			COMMAND_MOVE_SELECTED_DOWN.accept(this)
-		} else if(shiftPressed && e.keyCode == SWT.ARROW_LEFT) {
-			COMMAND_MOVE_SELECTED_LEFT.accept(this)
-		} else if(shiftPressed && e.keyCode == SWT.ARROW_RIGHT) {
-			COMMAND_MOVE_SELECTED_RIGHT.accept(this)
-		} else if(e.keyCode == SWT.ARROW_LEFT) {
-			COMMAND_NAVIGATE_LEFT.accept(this)
-		} else if(e.keyCode == SWT.ARROW_RIGHT) {
-			COMMAND_NAVIGATE_RIGHT.accept(this)
-		} else if(e.keyCode == SWT.ARROW_UP) {
-			COMMAND_NAVIGATE_UP.accept(this)
-		} else if(e.keyCode == SWT.ARROW_DOWN) {
-			COMMAND_NAVIGATE_DOWN.accept(this)
-		} else if(e.keyCode == SWT.CR) {
-			COMMAND_SELECT_FOCUSED.accept(this)
-		} else if(e.keyCode == 'c'.charAt(0)) {
-			COMMAND_CONNECT_SELECTED.accept(this)
-		} else if(e.keyCode == 'd'.charAt(0)) {
-			COMMAND_DISCONNECT_SELECTED.accept(this)
-		} else if(e.keyCode == SWT.DEL) {
-			COMMAND_REMOVE_SELECTED.accept(this)
-		} else if(altPressed && e.keyCode == 'i'.charAt(0)) {
-			COMMAND_MARK_SELECTED_AS_INPUT.accept(this)
-		} else if(altPressed && e.keyCode == 'o'.charAt(0)) {
-			COMMAND_MARK_SELECTED_AS_OUTPUT.accept(this)
-		}
-	}
-
 	def markAsDirty() {
 		editor.markAsDirty()
 	}
@@ -158,6 +76,28 @@ class LajerManager implements KeyListener {
 			node -> (constraint.topLeft.x -> constraint.topLeft.y)
 		].toMap([key], [value])
 		return new OperationModel(fullyQualifiedName, inputPorts.map[port].toList(), outputPorts.map[port].toList(), nodes.map[node].toList(), positions)
+	}
+
+	def markAsInput(InputFigure input) {
+		val operationInputFigure = new OperationInputFigure()
+		root.add(operationInputFigure)
+		val connection = new OriginConnectionFigure(operationInputFigure, input)
+		root.add(connection)
+		inputPorts.add(input)
+		input.addFigureListener [
+			layout.setConstraint(operationInputFigure, new Rectangle(input.bounds.center.x - 80, input.bounds.center.y - 10, -1, -1))
+		]
+	}
+
+	def markAsOutput(OutputFigure output) {
+		val operationOutputFigure = new OperationOutputFigure()
+		root.add(operationOutputFigure)
+		val connection = new CallbackConnectionFigure(output, operationOutputFigure)
+		root.add(connection)
+		outputPorts.add(output)
+		output.addFigureListener [
+			layout.setConstraint(operationOutputFigure, new Rectangle(output.bounds.center.x + 80, output.bounds.center.y - 10, -1, -1))
+		]
 	}
 
 	def focusOnFirst() {
@@ -200,16 +140,6 @@ class LajerManager implements KeyListener {
 
 	def isOutput(PortFigure port) {
 		return port instanceof OutputFigure
-	}
-
-	override keyReleased(KeyEvent e) {
-		if(e.keyCode == SWT.CTRL) {
-			ctrlPressed = false
-		} else if(e.keyCode == SWT.SHIFT) {
-			shiftPressed = false
-		} else if(e.keyCode == SWT.ALT) {
-			altPressed = false
-		}
 	}
 
 	def getLayout() {

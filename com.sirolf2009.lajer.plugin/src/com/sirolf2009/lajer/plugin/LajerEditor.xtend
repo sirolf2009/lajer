@@ -6,11 +6,7 @@ import com.sirolf2009.lajer.core.model.ComponentModel
 import com.sirolf2009.lajer.core.model.OperationModel
 import com.sirolf2009.lajer.core.model.PortModel
 import com.sirolf2009.lajer.core.model.SplitterModel
-import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure
-import com.sirolf2009.lajer.plugin.figure.OperationInputFigure
-import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure
-import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure
 import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -27,7 +23,6 @@ import org.eclipse.core.runtime.Path
 import org.eclipse.draw2d.Figure
 import org.eclipse.draw2d.LightweightSystem
 import org.eclipse.draw2d.XYLayout
-import org.eclipse.draw2d.geometry.Rectangle
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.internal.core.PackageFragment
 import org.eclipse.swt.SWT
@@ -72,7 +67,7 @@ class LajerEditor extends EditorPart {
 			contents.setLayoutManager(contentsLayout)
 
 			manager = new LajerManager(it, contentsLayout, contents, this)
-			addKeyListener(manager)
+			addKeyListener(new LajerKeylistener(manager))
 
 			inputFile.ifPresent [
 				try {
@@ -84,29 +79,11 @@ class LajerEditor extends EditorPart {
 					]
 					inputPorts.forEach [ inputPort |
 						val portFigure = manager.nodes.flatMap[inputFigures.filter[port === inputPort]].get(0)
-						val operationInputFigure = new OperationInputFigure()
-						val rectOrigin = manager.getConstraint(portFigure.node)
-						contents.add(operationInputFigure, new Rectangle(rectOrigin.center.x - 80, rectOrigin.center.y, -1, -1))
-						val connection = new OriginConnectionFigure(operationInputFigure, portFigure)
-						contents.add(connection)
-						manager.inputPorts.add(portFigure)
-						portFigure.node.addFigureListener [
-							val rect = manager.getConstraint(portFigure.node)
-							contentsLayout.setConstraint(operationInputFigure, new Rectangle(rect.center.x - 80, rect.center.y, -1, -1))
-						]
+						manager.markAsInput(portFigure)
 					]
 					outputPorts.forEach [ outputPort |
 						val portFigure = manager.nodes.flatMap[outputFigures.filter[port === outputPort]].get(0)
-						val operationOutputFigure = new OperationOutputFigure()
-						val rectOrigin = manager.getConstraint(portFigure.node)
-						contents.add(operationOutputFigure, new Rectangle(rectOrigin.center.x + 160, rectOrigin.center.y, -1, -1))
-						val connection = new CallbackConnectionFigure(portFigure, operationOutputFigure)
-						contents.add(connection)
-						manager.outputPorts.add(portFigure)
-						portFigure.node.addFigureListener [
-							val rect = manager.getConstraint(portFigure.node)
-							contentsLayout.setConstraint(operationOutputFigure, new Rectangle(rect.center.x + 160, rect.center.y, -1, -1))
-						]
+						manager.markAsOutput(portFigure)
 					]
 				} catch(Exception e) {
 					e.printStackTrace()
@@ -115,7 +92,7 @@ class LajerEditor extends EditorPart {
 
 			lws.contents = contents
 
-			val target = new DropTarget(it, DND.DROP_NONE)
+			val target = new DropTarget(it, DND.DROP_COPY.bitwiseOr(DND.DROP_NONE).bitwiseOr(DND.DROP_MOVE))
 			target.transfer = #[FileTransfer.instance]
 			target.addDropListener(new DropTargetListener() {
 
@@ -139,6 +116,7 @@ class LajerEditor extends EditorPart {
 						val project = JavaCore.create(file.project)
 						val package = javaFile.parent as PackageFragment
 						val type = project.findType(package.names.join(".") + "." + javaFile.elementName.replace(".java", ""))
+						javaFile.openable.open(new NullProgressMonitor)
 						val nodeType = type.annotations.filter[elementName.equals("Component") || elementName.equals("Splitter")].get(0)
 						val exposed = type.methods.filter[!annotations.filter[elementName.equals("Expose")].empty].toList()
 
@@ -210,5 +188,5 @@ class LajerEditor extends EditorPart {
 	override getPartName() {
 		return editorInput.file.name
 	}
-	
+
 }

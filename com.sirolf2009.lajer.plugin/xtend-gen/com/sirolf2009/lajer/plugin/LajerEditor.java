@@ -8,13 +8,10 @@ import com.sirolf2009.lajer.core.model.NodeModel;
 import com.sirolf2009.lajer.core.model.OperationModel;
 import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.core.model.SplitterModel;
-import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure;
+import com.sirolf2009.lajer.plugin.LajerKeylistener;
 import com.sirolf2009.lajer.plugin.figure.ConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
-import com.sirolf2009.lajer.plugin.figure.OperationInputFigure;
-import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure;
-import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.lajer.LajerManager;
 import java.io.BufferedReader;
@@ -38,15 +35,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FigureListener;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.PackageFragment;
@@ -119,7 +114,8 @@ public class LajerEditor extends EditorPart {
       contents.setLayoutManager(contentsLayout);
       LajerManager _lajerManager = new LajerManager(it, contentsLayout, contents, this);
       this.manager = _lajerManager;
-      it.addKeyListener(this.manager);
+      LajerKeylistener _lajerKeylistener = new LajerKeylistener(this.manager);
+      it.addKeyListener(_lajerKeylistener);
       final Consumer<OperationModel> _function_1 = (OperationModel it_1) -> {
         try {
           final Consumer<NodeModel> _function_2 = (NodeModel node) -> {
@@ -159,19 +155,7 @@ public class LajerEditor extends EditorPart {
               return IterableExtensions.<InputFigure>filter(it_2.getInputFigures(), _function_6);
             };
             final InputFigure portFigure = ((InputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, InputFigure>flatMap(this.manager.getNodes(), _function_5), InputFigure.class))[0];
-            final OperationInputFigure operationInputFigure = new OperationInputFigure();
-            final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
-            Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x - 80), rectOrigin.getCenter().y, (-1), (-1));
-            contents.add(operationInputFigure, _rectangle);
-            final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, portFigure);
-            contents.add(connection);
-            this.manager.getInputPorts().add(portFigure);
-            final FigureListener _function_6 = (IFigure it_2) -> {
-              final Rectangle rect = this.manager.getConstraint(portFigure.getNode());
-              Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x - 80), rect.getCenter().y, (-1), (-1));
-              contentsLayout.setConstraint(operationInputFigure, _rectangle_1);
-            };
-            portFigure.getNode().addFigureListener(_function_6);
+            this.manager.markAsInput(portFigure);
           };
           it_1.getInputPorts().forEach(_function_4);
           final Consumer<PortModel> _function_5 = (PortModel outputPort) -> {
@@ -183,19 +167,7 @@ public class LajerEditor extends EditorPart {
               return IterableExtensions.<OutputFigure>filter(it_2.getOutputFigures(), _function_7);
             };
             final OutputFigure portFigure = ((OutputFigure[])Conversions.unwrapArray(IterableExtensions.<INodeFigure, OutputFigure>flatMap(this.manager.getNodes(), _function_6), OutputFigure.class))[0];
-            final OperationOutputFigure operationOutputFigure = new OperationOutputFigure();
-            final Rectangle rectOrigin = this.manager.getConstraint(portFigure.getNode());
-            Rectangle _rectangle = new Rectangle((rectOrigin.getCenter().x + 160), rectOrigin.getCenter().y, (-1), (-1));
-            contents.add(operationOutputFigure, _rectangle);
-            final CallbackConnectionFigure connection = new CallbackConnectionFigure(portFigure, operationOutputFigure);
-            contents.add(connection);
-            this.manager.getOutputPorts().add(portFigure);
-            final FigureListener _function_7 = (IFigure it_2) -> {
-              final Rectangle rect = this.manager.getConstraint(portFigure.getNode());
-              Rectangle _rectangle_1 = new Rectangle((rect.getCenter().x + 160), rect.getCenter().y, (-1), (-1));
-              contentsLayout.setConstraint(operationOutputFigure, _rectangle_1);
-            };
-            portFigure.getNode().addFigureListener(_function_7);
+            this.manager.markAsOutput(portFigure);
           };
           it_1.getOutputPorts().forEach(_function_5);
         } catch (final Throwable _t) {
@@ -209,7 +181,7 @@ public class LajerEditor extends EditorPart {
       };
       this.inputFile.ifPresent(_function_1);
       lws.setContents(contents);
-      final DropTarget target = new DropTarget(it, DND.DROP_NONE);
+      final DropTarget target = new DropTarget(it, ((DND.DROP_COPY | DND.DROP_NONE) | DND.DROP_MOVE));
       FileTransfer _instance = FileTransfer.getInstance();
       target.setTransfer(new Transfer[] { _instance });
       target.addDropListener(new DropTargetListener() {
@@ -244,6 +216,9 @@ public class LajerEditor extends EditorPart {
               String _replace = javaFile.getElementName().replace(".java", "");
               String _plus_1 = (_plus + _replace);
               final IType type = project.findType(_plus_1);
+              IOpenable _openable = javaFile.getOpenable();
+              NullProgressMonitor _nullProgressMonitor = new NullProgressMonitor();
+              _openable.open(_nullProgressMonitor);
               final Function1<IAnnotation, Boolean> _function_1 = (IAnnotation it_2) -> {
                 return Boolean.valueOf((it_2.getElementName().equals("Component") || it_2.getElementName().equals("Splitter")));
               };

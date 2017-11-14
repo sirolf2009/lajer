@@ -6,9 +6,8 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import org.eclipse.xtend.lib.annotations.ToString
 
-@FinalFieldsConstructor @ToString @Accessors class OperationModel extends NodeModel {
+@FinalFieldsConstructor @Accessors class OperationModel extends NodeModel {
 	
 	val List<NodeModel> components
 	val Map<NodeModel, Pair<Integer, Integer>> positions

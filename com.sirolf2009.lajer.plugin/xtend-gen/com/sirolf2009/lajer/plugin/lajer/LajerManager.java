@@ -5,20 +5,16 @@ import com.sirolf2009.lajer.core.model.OperationModel;
 import com.sirolf2009.lajer.core.model.PortModel;
 import com.sirolf2009.lajer.core.model.SplitterModel;
 import com.sirolf2009.lajer.plugin.LajerEditor;
+import com.sirolf2009.lajer.plugin.figure.CallbackConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.INodeFigure;
 import com.sirolf2009.lajer.plugin.figure.InputFigure;
 import com.sirolf2009.lajer.plugin.figure.NodeFigure;
+import com.sirolf2009.lajer.plugin.figure.OperationInputFigure;
+import com.sirolf2009.lajer.plugin.figure.OperationOutputFigure;
+import com.sirolf2009.lajer.plugin.figure.OriginConnectionFigure;
 import com.sirolf2009.lajer.plugin.figure.OutputFigure;
 import com.sirolf2009.lajer.plugin.figure.PortFigure;
 import com.sirolf2009.lajer.plugin.figure.SplitterFigure;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandConnectSelected;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandDisconnectSelected;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsInput;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMarkSelectedAsOutput;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandMoveSelected;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandNavigate;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandRemoveSelected;
-import com.sirolf2009.lajer.plugin.lajer.command.LajerCommandSelectFocused;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,15 +22,13 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FigureListener;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
@@ -45,43 +39,7 @@ import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.eclipse.xtext.xbase.lib.Pair;
 
 @SuppressWarnings("all")
-public class LajerManager implements KeyListener {
-  public final static LajerCommandNavigate.NavigateUp COMMAND_NAVIGATE_UP = new LajerCommandNavigate.NavigateUp(45);
-  
-  public final static LajerCommandNavigate.NavigateDown COMMAND_NAVIGATE_DOWN = new LajerCommandNavigate.NavigateDown(45);
-  
-  public final static LajerCommandNavigate.NavigateLeft COMMAND_NAVIGATE_LEFT = new LajerCommandNavigate.NavigateLeft(45);
-  
-  public final static LajerCommandNavigate.NavigateRight COMMAND_NAVIGATE_RIGHT = new LajerCommandNavigate.NavigateRight(45);
-  
-  public final static LajerCommandSelectFocused COMMAND_SELECT_FOCUSED = new LajerCommandSelectFocused();
-  
-  public final static LajerCommandRemoveSelected COMMAND_REMOVE_SELECTED = new LajerCommandRemoveSelected();
-  
-  public final static LajerCommandConnectSelected COMMAND_CONNECT_SELECTED = new LajerCommandConnectSelected();
-  
-  public final static LajerCommandDisconnectSelected COMMAND_DISCONNECT_SELECTED = new LajerCommandDisconnectSelected();
-  
-  public final static LajerCommandMarkSelectedAsInput COMMAND_MARK_SELECTED_AS_INPUT = new LajerCommandMarkSelectedAsInput();
-  
-  public final static LajerCommandMarkSelectedAsOutput COMMAND_MARK_SELECTED_AS_OUTPUT = new LajerCommandMarkSelectedAsOutput();
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedUp COMMAND_MOVE_SELECTED_UP = new LajerCommandMoveSelected.LajerCommandMoveSelectedUp(10);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedDown COMMAND_MOVE_SELECTED_DOWN = new LajerCommandMoveSelected.LajerCommandMoveSelectedDown(10);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedLeft COMMAND_MOVE_SELECTED_LEFT = new LajerCommandMoveSelected.LajerCommandMoveSelectedLeft(10);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedRight COMMAND_MOVE_SELECTED_RIGHT = new LajerCommandMoveSelected.LajerCommandMoveSelectedRight(10);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedUp COMMAND_MOVE_SELECTED_UP_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedUp(1);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedDown COMMAND_MOVE_SELECTED_DOWN_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedDown(1);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedLeft COMMAND_MOVE_SELECTED_LEFT_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedLeft(1);
-  
-  public final static LajerCommandMoveSelected.LajerCommandMoveSelectedRight COMMAND_MOVE_SELECTED_RIGHT_PRECISE = new LajerCommandMoveSelected.LajerCommandMoveSelectedRight(1);
-  
+public class LajerManager {
   private final Canvas canvas;
   
   private final XYLayout layout;
@@ -94,17 +52,11 @@ public class LajerManager implements KeyListener {
   
   private final Set<PortFigure> selected;
   
-  private final Set<PortFigure> inputPorts;
+  private final Set<InputFigure> inputPorts;
   
-  private final Set<PortFigure> outputPorts;
+  private final Set<OutputFigure> outputPorts;
   
   private PortFigure focused;
-  
-  private boolean ctrlPressed = false;
-  
-  private boolean shiftPressed = false;
-  
-  private boolean altPressed = false;
   
   public LajerManager(final Canvas canvas, final XYLayout layout, final Figure root, final LajerEditor editor) {
     this.canvas = canvas;
@@ -113,9 +65,9 @@ public class LajerManager implements KeyListener {
     this.editor = editor;
     HashSet<PortFigure> _hashSet = new HashSet<PortFigure>();
     this.selected = _hashSet;
-    HashSet<PortFigure> _hashSet_1 = new HashSet<PortFigure>();
+    HashSet<InputFigure> _hashSet_1 = new HashSet<InputFigure>();
     this.inputPorts = _hashSet_1;
-    HashSet<PortFigure> _hashSet_2 = new HashSet<PortFigure>();
+    HashSet<OutputFigure> _hashSet_2 = new HashSet<OutputFigure>();
     this.outputPorts = _hashSet_2;
     ArrayList<INodeFigure> _arrayList = new ArrayList<INodeFigure>();
     this.nodes = _arrayList;
@@ -138,96 +90,6 @@ public class LajerManager implements KeyListener {
     this.layout.setConstraint(figure, _rectangle);
     this.root.add(figure);
     return ((Figure)figure);
-  }
-  
-  @Override
-  public void keyPressed(final KeyEvent e) {
-    if ((e.keyCode == SWT.CTRL)) {
-      this.ctrlPressed = true;
-    } else {
-      if ((e.keyCode == SWT.SHIFT)) {
-        this.shiftPressed = true;
-      } else {
-        if ((e.keyCode == SWT.ALT)) {
-          this.altPressed = true;
-        }
-      }
-    }
-    if (((this.ctrlPressed && this.shiftPressed) && (e.keyCode == SWT.ARROW_UP))) {
-      LajerManager.COMMAND_MOVE_SELECTED_UP_PRECISE.accept(this);
-    } else {
-      if (((this.ctrlPressed && this.shiftPressed) && (e.keyCode == SWT.ARROW_DOWN))) {
-        LajerManager.COMMAND_MOVE_SELECTED_DOWN_PRECISE.accept(this);
-      } else {
-        if (((this.ctrlPressed && this.shiftPressed) && (e.keyCode == SWT.ARROW_LEFT))) {
-          LajerManager.COMMAND_MOVE_SELECTED_LEFT_PRECISE.accept(this);
-        } else {
-          if (((this.ctrlPressed && this.shiftPressed) && (e.keyCode == SWT.ARROW_RIGHT))) {
-            LajerManager.COMMAND_MOVE_SELECTED_RIGHT_PRECISE.accept(this);
-          } else {
-            if ((this.shiftPressed && (e.keyCode == SWT.ARROW_UP))) {
-              LajerManager.COMMAND_MOVE_SELECTED_UP.accept(this);
-            } else {
-              if ((this.shiftPressed && (e.keyCode == SWT.ARROW_DOWN))) {
-                LajerManager.COMMAND_MOVE_SELECTED_DOWN.accept(this);
-              } else {
-                if ((this.shiftPressed && (e.keyCode == SWT.ARROW_LEFT))) {
-                  LajerManager.COMMAND_MOVE_SELECTED_LEFT.accept(this);
-                } else {
-                  if ((this.shiftPressed && (e.keyCode == SWT.ARROW_RIGHT))) {
-                    LajerManager.COMMAND_MOVE_SELECTED_RIGHT.accept(this);
-                  } else {
-                    if ((e.keyCode == SWT.ARROW_LEFT)) {
-                      LajerManager.COMMAND_NAVIGATE_LEFT.accept(this);
-                    } else {
-                      if ((e.keyCode == SWT.ARROW_RIGHT)) {
-                        LajerManager.COMMAND_NAVIGATE_RIGHT.accept(this);
-                      } else {
-                        if ((e.keyCode == SWT.ARROW_UP)) {
-                          LajerManager.COMMAND_NAVIGATE_UP.accept(this);
-                        } else {
-                          if ((e.keyCode == SWT.ARROW_DOWN)) {
-                            LajerManager.COMMAND_NAVIGATE_DOWN.accept(this);
-                          } else {
-                            if ((e.keyCode == SWT.CR)) {
-                              LajerManager.COMMAND_SELECT_FOCUSED.accept(this);
-                            } else {
-                              char _charAt = "c".charAt(0);
-                              boolean _equals = (e.keyCode == _charAt);
-                              if (_equals) {
-                                LajerManager.COMMAND_CONNECT_SELECTED.accept(this);
-                              } else {
-                                char _charAt_1 = "d".charAt(0);
-                                boolean _equals_1 = (e.keyCode == _charAt_1);
-                                if (_equals_1) {
-                                  LajerManager.COMMAND_DISCONNECT_SELECTED.accept(this);
-                                } else {
-                                  if ((e.keyCode == SWT.DEL)) {
-                                    LajerManager.COMMAND_REMOVE_SELECTED.accept(this);
-                                  } else {
-                                    if ((this.altPressed && (e.keyCode == "i".charAt(0)))) {
-                                      LajerManager.COMMAND_MARK_SELECTED_AS_INPUT.accept(this);
-                                    } else {
-                                      if ((this.altPressed && (e.keyCode == "o".charAt(0)))) {
-                                        LajerManager.COMMAND_MARK_SELECTED_AS_OUTPUT.accept(this);
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
   
   public boolean markAsDirty() {
@@ -272,14 +134,14 @@ public class LajerManager implements KeyListener {
         return it.getValue();
       };
       final Map<NodeModel, Pair<Integer, Integer>> positions = IterableExtensions.<Pair<NodeModel, Pair<Integer, Integer>>, NodeModel, Pair<Integer, Integer>>toMap(ListExtensions.<INodeFigure, Pair<NodeModel, Pair<Integer, Integer>>>map(this.nodes, _function_1), _function_2, _function_3);
-      final Function1<PortFigure, PortModel> _function_4 = (PortFigure it) -> {
+      final Function1<InputFigure, PortModel> _function_4 = (InputFigure it) -> {
         return it.getPort();
       };
-      List<PortModel> _list = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.inputPorts, _function_4));
-      final Function1<PortFigure, PortModel> _function_5 = (PortFigure it) -> {
+      List<PortModel> _list = IterableExtensions.<PortModel>toList(IterableExtensions.<InputFigure, PortModel>map(this.inputPorts, _function_4));
+      final Function1<OutputFigure, PortModel> _function_5 = (OutputFigure it) -> {
         return it.getPort();
       };
-      List<PortModel> _list_1 = IterableExtensions.<PortModel>toList(IterableExtensions.<PortFigure, PortModel>map(this.outputPorts, _function_5));
+      List<PortModel> _list_1 = IterableExtensions.<PortModel>toList(IterableExtensions.<OutputFigure, PortModel>map(this.outputPorts, _function_5));
       final Function1<INodeFigure, NodeModel> _function_6 = (INodeFigure it) -> {
         return it.getNode();
       };
@@ -288,6 +150,32 @@ public class LajerManager implements KeyListener {
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
+  }
+  
+  public void markAsInput(final InputFigure input) {
+    final OperationInputFigure operationInputFigure = new OperationInputFigure();
+    this.root.add(operationInputFigure);
+    final OriginConnectionFigure connection = new OriginConnectionFigure(operationInputFigure, input);
+    this.root.add(connection);
+    this.inputPorts.add(input);
+    final FigureListener _function = (IFigure it) -> {
+      Rectangle _rectangle = new Rectangle((input.getBounds().getCenter().x - 80), (input.getBounds().getCenter().y - 10), (-1), (-1));
+      this.layout.setConstraint(operationInputFigure, _rectangle);
+    };
+    input.addFigureListener(_function);
+  }
+  
+  public void markAsOutput(final OutputFigure output) {
+    final OperationOutputFigure operationOutputFigure = new OperationOutputFigure();
+    this.root.add(operationOutputFigure);
+    final CallbackConnectionFigure connection = new CallbackConnectionFigure(output, operationOutputFigure);
+    this.root.add(connection);
+    this.outputPorts.add(output);
+    final FigureListener _function = (IFigure it) -> {
+      Rectangle _rectangle = new Rectangle((output.getBounds().getCenter().x + 80), (output.getBounds().getCenter().y - 10), (-1), (-1));
+      this.layout.setConstraint(operationOutputFigure, _rectangle);
+    };
+    output.addFigureListener(_function);
   }
   
   public void focusOnFirst() {
@@ -347,21 +235,6 @@ public class LajerManager implements KeyListener {
     return (port instanceof OutputFigure);
   }
   
-  @Override
-  public void keyReleased(final KeyEvent e) {
-    if ((e.keyCode == SWT.CTRL)) {
-      this.ctrlPressed = false;
-    } else {
-      if ((e.keyCode == SWT.SHIFT)) {
-        this.shiftPressed = false;
-      } else {
-        if ((e.keyCode == SWT.ALT)) {
-          this.altPressed = false;
-        }
-      }
-    }
-  }
-  
   public XYLayout getLayout() {
     return this.layout;
   }
@@ -382,11 +255,11 @@ public class LajerManager implements KeyListener {
     return this.focused;
   }
   
-  public Set<PortFigure> getInputPorts() {
+  public Set<InputFigure> getInputPorts() {
     return this.inputPorts;
   }
   
-  public Set<PortFigure> getOutputPorts() {
+  public Set<OutputFigure> getOutputPorts() {
     return this.outputPorts;
   }
 }

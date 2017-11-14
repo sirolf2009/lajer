@@ -28,7 +28,7 @@ public abstract class Component extends JavaBasedNode {
   @Pure
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
+    int result = super.hashCode();
     result = prime * result + ((this.ports== null) ? 0 : this.ports.hashCode());
     return result;
   }
@@ -41,6 +41,8 @@ public abstract class Component extends JavaBasedNode {
     if (obj == null)
       return false;
     if (getClass() != obj.getClass())
+      return false;
+    if (!super.equals(obj))
       return false;
     Component other = (Component) obj;
     if (this.ports == null) {

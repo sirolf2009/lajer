@@ -38,8 +38,8 @@ class TestPersistor {
 		outputs: []'''
 		val model = LajerModelPersistor.parseModel(persisted)
 		model.connections.forEach [ connection |
-			val fromComponent = model.components.flatMap[outputPorts.filter[it === connection.from]].get(0)
-			val toComponent = model.components.flatMap[inputPorts.filter[it === connection.to]].get(0)
+			val fromComponent = model.components.map[outputPorts.filter[it === connection.from]].flatten.get(0)
+			val toComponent = model.components.map[inputPorts.filter[it === connection.to]].flatten.get(0)
 			Assert.assertNotNull(fromComponent)
 			Assert.assertNotNull(toComponent)
 		]
@@ -50,4 +50,13 @@ class TestPersistor {
 			it instanceof SplitterModel
 		].size())
 	}
+	
+	@Test
+	def void test() {
+		val persisted = "version: 1name: com.sirolf2009.lajer.test.Testnodes: [(S:com.sirolf2009.lajer.test.EquationChecker:1:2)->equationChecker,(C:com.sirolf2009.lajer.test.UserInput:1:1)->userInput]positions: [equationChecker->(130:40),userInput->(158:130)]connections: [(equationChecker:1)->(userInput:0),(userInput:0)->(equationChecker:0)]inputs: [(userInput:0)]outputs: [(equationChecker:0)]"
+		val model = LajerModelPersistor.parseModel(persisted)
+		Assert.assertEquals(1, model.inputPorts.size())
+		Assert.assertEquals(1, model.outputPorts.size())
+	}
+	
 }

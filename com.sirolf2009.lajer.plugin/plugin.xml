@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.ui.editors">
+	<extension point="org.eclipse.ui.editors">
       <editor
             class="com.sirolf2009.lajer.plugin.LajerEditor"
             extensions="lajer"
             id="com.sirolf2009.lajer.plugin.LajerEditor"
             name="Lajer Editor">
       </editor>
-   </extension>
+	</extension>
+	<extension point="org.eclipse.ui.views">
+		<view 
+			id="com.sirolf2009.lajer.plugin.Library"
+            name="Library"
+			class="com.sirolf2009.lajer.plugin.Library"/>
+	</extension>
 
 </plugin>

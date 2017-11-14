@@ -18,15 +18,15 @@ import java.util.regex.Pattern
 
 class LajerModelPersistor {
 
-	static val versionPattern = Pattern.compile("version: ([0-9]+)")
-	static val namePattern = Pattern.compile("name: (.+)")
-	static val nodesPattern = Pattern.compile("nodes: \\[(.*)\\]")
+	static val versionPattern = Pattern.compile("version: ([0-9]+)name")
+	static val namePattern = Pattern.compile("name: (.+)nodes")
+	static val nodesPattern = Pattern.compile("nodes: \\[(.*)\\]positions")
 	static val nodeDeclarationPattern = Pattern.compile('''\(([CSO]):([a-zA-Z0-9\.]+):([0-9]):([0-9])\)->([a-zA-Z0-9]+)''')
-	static val positionsPattern = Pattern.compile("positions: \\[(.*)\\]")
+	static val positionsPattern = Pattern.compile("positions: \\[(.*)\\]connections")
 	static val positionDeclarationPattern = Pattern.compile('''([a-zA-Z0-9]+)->\(([0-9]+):([0-9]+)\)''')
-	static val connectionsPattern = Pattern.compile("connections: \\[(.*)\\]")
+	static val connectionsPattern = Pattern.compile("connections: \\[(.*)\\]inputs")
 	static val connectionDeclarationPattern = Pattern.compile('''\(([a-zA-Z0-9]+):([0-9])\)->\(([a-zA-Z0-9]+):([0-9])\)''')
-	static val inputsPattern = Pattern.compile("inputs: \\[(.*)\\]")
+	static val inputsPattern = Pattern.compile("inputs: \\[(.*)\\]outputs")
 	static val outputsPattern = Pattern.compile("outputs: \\[(.*)\\]")
 	static val portDeclarationPattern = Pattern.compile('''\(([a-zA-Z0-9]+):([0-9])\)''')
 
@@ -77,7 +77,8 @@ class LajerModelPersistor {
 		return '''(«ctx.getVariableName(port.component)»:«port.component.inputPorts.indexOf(port)»)'''
 	}
 
-	def static parseModel(String model) {
+	def static parseModel(String rawModel) {
+		val model = rawModel.replace("\n", "")
 		val version = Integer.parseInt(model.findOne(versionPattern))
 		if(version != 1) {
 			throw new IllegalArgumentException("Unknown version: " + version)
