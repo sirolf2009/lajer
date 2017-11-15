@@ -53,8 +53,8 @@ class TestComponentAnnotation {
 		  @java.lang.Override
 		  public List<Port> getPorts() {
 		    try {
-		    	return Arrays.asList((Port) new com.sirolf2009.lajer.core.component.MethodPort(this, java.lang.invoke.MethodHandles.lookup().bind(this, "add", java.lang.invoke.MethodType.methodType(int.class, int.class, int.class))),
-		    	(Port) new com.sirolf2009.lajer.core.component.MethodPort(this, java.lang.invoke.MethodHandles.lookup().bind(this, "multiply", java.lang.invoke.MethodType.methodType(int.class, int.class, int.class))));
+		    	return Arrays.asList((Port) new com.sirolf2009.lajer.core.component.AdaptablePort(java.util.Arrays.asList(int.class, int.class), new com.sirolf2009.lajer.core.component.FunctionPort(this, java.lang.invoke.MethodHandles.lookup().bind(this, "add", java.lang.invoke.MethodType.methodType(int.class, int.class, int.class)))),
+		    	(Port) new com.sirolf2009.lajer.core.component.AdaptablePort(java.util.Arrays.asList(int.class, int.class), new com.sirolf2009.lajer.core.component.FunctionPort(this, java.lang.invoke.MethodHandles.lookup().bind(this, "multiply", java.lang.invoke.MethodType.methodType(int.class, int.class, int.class)))));
 		    } catch(Exception e) {
 		    	throw new RuntimeException(e);
 		    }

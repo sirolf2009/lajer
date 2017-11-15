@@ -26,7 +26,10 @@ annotation Component {
 				addAnnotation(newAnnotationReference(Expose))
 			]
 
-			val methodPort = "com.sirolf2009.lajer.core.component.MethodPort"
+			val adaptablePort = "com.sirolf2009.lajer.core.component.AdaptablePort"
+			val functionPort = "com.sirolf2009.lajer.core.component.FunctionPort"
+			val consumerPort = "com.sirolf2009.lajer.core.component.ConsumerPort"
+			val producerPort = "com.sirolf2009.lajer.core.component.ProducerPort"
 			val methodHandle = "java.lang.invoke.MethodHandles"
 			val methodType = "java.lang.invoke.MethodType"
 
@@ -37,9 +40,11 @@ annotation Component {
 				try {
 					return «Arrays.newTypeReference()».asList(«ports.map[
 			 			if(parameters.size() == 0) {
-			 				'''(Port) new «methodPort»(this, «methodHandle».lookup().bind(this, "«simpleName»", «methodType».methodType(«returnType».class)))'''
+			 				'''(Port) new «producerPort»(this, «methodHandle».lookup().bind(this, "«simpleName»", «methodType».methodType(«returnType».class)))'''
+			 			} else if(returnType == newTypeReference(void)) {
+			 				'''(Port) new «adaptablePort»(java.util.Arrays.asList(«parameters.map[type+".class"].join(", ")»), new «consumerPort»(this, «methodHandle».lookup().bind(this, "«simpleName»", «methodType».methodType(«returnType».class, «parameters.map[type+".class"].join(", ")»))))'''
 			 			} else {
-			 				'''(Port) new «methodPort»(this, «methodHandle».lookup().bind(this, "«simpleName»", «methodType».methodType(«returnType».class, «parameters.map[type+".class"].join(", ")»)))'''
+			 				'''(Port) new «adaptablePort»(java.util.Arrays.asList(«parameters.map[type+".class"].join(", ")»), new «functionPort»(this, «methodHandle».lookup().bind(this, "«simpleName»", «methodType».methodType(«returnType».class, «parameters.map[type+".class"].join(", ")»))))'''
 			 			}
 			 		].join(",\n")»);
 				} catch(Exception e) {

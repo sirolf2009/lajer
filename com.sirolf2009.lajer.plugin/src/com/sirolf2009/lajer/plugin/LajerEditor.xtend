@@ -184,7 +184,7 @@ class LajerEditor extends EditorPart {
 	}
 
 	override isDirty() {
-		return true
+		return dirty
 	}
 
 	override isSaveAsAllowed() {

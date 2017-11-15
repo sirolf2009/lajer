@@ -2,7 +2,6 @@ package com.sirolf2009.lajer.core.operation
 
 import com.sirolf2009.lajer.core.annotation.Expose
 import com.sirolf2009.lajer.core.component.Component
-import com.sirolf2009.lajer.core.component.MethodPort
 import com.sirolf2009.lajer.core.operation.model.Operation
 import com.sirolf2009.lajer.core.splitter.Splitter
 import com.sirolf2009.lajer.core.splitter.SplitterPort
@@ -12,6 +11,8 @@ import java.util.Scanner
 import javax.swing.JOptionPane
 
 import static extension com.sirolf2009.lajer.core.operation.model.Connection.*
+import com.sirolf2009.lajer.core.component.AdaptablePort
+import com.sirolf2009.lajer.core.component.FunctionPort
 
 class TestCalculator {
 	
@@ -47,7 +48,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new AdaptablePort(#[String], new FunctionPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String))))]
 		}
 		
 	}
@@ -68,7 +69,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "calculate", MethodType.methodType(int, String)))]
 		}
 
 	}
@@ -84,7 +85,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "readUserInput", MethodType.methodType(String)))]
 		}
 
 	}
@@ -112,7 +113,7 @@ class TestCalculator {
 		}
 		
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "display", MethodType.methodType(void, int)))]
 		}
 
 	}

@@ -1,7 +1,6 @@
 package com.sirolf2009.lajer.core.operation;
 
 import com.sirolf2009.lajer.core.Port;
-import com.sirolf2009.lajer.core.component.MethodPort;
 import com.sirolf2009.lajer.core.operation.model.Connection;
 import com.sirolf2009.lajer.core.splitter.SplitterPort;
 import java.util.Collections;
@@ -38,11 +37,8 @@ public class LajerThread {
     if ((port instanceof SplitterPort)) {
       this.runSplitterPort(((SplitterPort)port), args);
     } else {
-      if ((port instanceof MethodPort)) {
-        this.runMethodPort(((MethodPort)port), args);
-      } else {
-        throw new IllegalArgumentException(("Cannot run port " + port));
-      }
+      Object _apply = port.apply(args);
+      this.propagate(Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(_apply)), port.getOutgoingConnections());
     }
   }
   
@@ -53,11 +49,6 @@ public class LajerThread {
     } else {
       this.propagate(args, port.getComponent().getFalsePort().getOutgoingConnections());
     }
-  }
-  
-  public void runMethodPort(final MethodPort port, final List<Object> args) {
-    Object _apply = port.apply(args);
-    this.propagate(Collections.<Object>unmodifiableList(CollectionLiterals.<Object>newArrayList(_apply)), port.getOutgoingConnections());
   }
   
   public void propagate(final List<Object> args, final List<Connection> connections) {

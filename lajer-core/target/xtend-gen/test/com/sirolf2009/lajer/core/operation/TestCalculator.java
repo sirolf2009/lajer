@@ -3,8 +3,9 @@ package com.sirolf2009.lajer.core.operation;
 import com.sirolf2009.lajer.core.Node;
 import com.sirolf2009.lajer.core.Port;
 import com.sirolf2009.lajer.core.annotation.Expose;
+import com.sirolf2009.lajer.core.component.AdaptablePort;
 import com.sirolf2009.lajer.core.component.Component;
-import com.sirolf2009.lajer.core.component.MethodPort;
+import com.sirolf2009.lajer.core.component.FunctionPort;
 import com.sirolf2009.lajer.core.operation.model.Connection;
 import com.sirolf2009.lajer.core.operation.model.Operation;
 import com.sirolf2009.lajer.core.splitter.DummyPort;
@@ -39,8 +40,9 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
+        FunctionPort _functionPort = new FunctionPort(this, _bind);
+        AdaptablePort _adaptablePort = new AdaptablePort(Collections.<Class<?>>unmodifiableList(CollectionLiterals.<Class<?>>newArrayList(String.class)), _functionPort);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_adaptablePort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -63,8 +65,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
+        FunctionPort _functionPort = new FunctionPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_functionPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -83,8 +85,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "readUserInput", MethodType.methodType(String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
+        FunctionPort _functionPort = new FunctionPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_functionPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }
@@ -118,8 +120,8 @@ public class TestCalculator {
     public List<Port> getPorts() {
       try {
         MethodHandle _bind = MethodHandles.lookup().bind(this, "display", MethodType.methodType(void.class, int.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
+        FunctionPort _functionPort = new FunctionPort(this, _bind);
+        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_functionPort));
       } catch (Throwable _e) {
         throw Exceptions.sneakyThrow(_e);
       }

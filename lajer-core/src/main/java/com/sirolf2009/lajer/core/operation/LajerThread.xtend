@@ -1,7 +1,6 @@
 package com.sirolf2009.lajer.core.operation
 
 import com.sirolf2009.lajer.core.Port
-import com.sirolf2009.lajer.core.component.MethodPort
 import com.sirolf2009.lajer.core.operation.model.Connection
 import com.sirolf2009.lajer.core.splitter.SplitterPort
 import java.util.List
@@ -25,13 +24,11 @@ import org.eclipse.xtend.lib.annotations.Data
 	def void runPort(Port port, List<Object> args) {
 		if(port instanceof SplitterPort) {
 			runSplitterPort(port, args)
-		} else if(port instanceof MethodPort) {
-			runMethodPort(port, args)
 		} else {
-			throw new IllegalArgumentException("Cannot run port "+port)
+			propagate(#[port.apply(args)], port.outgoingConnections)
 		}
 	}
-	
+
 	def runSplitterPort(SplitterPort port, List<Object> args) {
 		val result = port.apply(args)
 		if(result) {
@@ -40,11 +37,7 @@ import org.eclipse.xtend.lib.annotations.Data
 			propagate(args, port.component.falsePort.outgoingConnections)
 		}
 	}
-	
-	def runMethodPort(MethodPort port, List<Object> args) {
-		propagate(#[port.apply(args)], port.outgoingConnections)
-	}
-	
+
 	def propagate(List<Object> args, List<Connection> connections) {
 		if(connections.size() == 1) {
 			connections.get(0).to.runPort(args)

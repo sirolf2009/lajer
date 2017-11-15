@@ -2,17 +2,14 @@ package com.sirolf2009.lajer.plugin;
 
 import com.sirolf2009.lajer.core.Port;
 import com.sirolf2009.lajer.core.component.Component;
-import com.sirolf2009.lajer.core.component.MethodPort;
 import com.sirolf2009.lajer.core.splitter.Splitter;
 import com.sirolf2009.lajer.core.splitter.SplitterPort;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 
@@ -31,13 +28,8 @@ public class ExampleComponents {
     
     @Override
     public List<Port> getPorts() {
-      try {
-        MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
-      } catch (Throwable _e) {
-        throw Exceptions.sneakyThrow(_e);
-      }
+      throw new Error("Unresolved compilation problems:"
+        + "\nMethodPort cannot be resolved.");
     }
   }
   
@@ -54,13 +46,8 @@ public class ExampleComponents {
     
     @Override
     public List<Port> getPorts() {
-      try {
-        MethodHandle _bind = MethodHandles.lookup().bind(this, "calculate", MethodType.methodType(int.class, String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
-      } catch (Throwable _e) {
-        throw Exceptions.sneakyThrow(_e);
-      }
+      throw new Error("Unresolved compilation problems:"
+        + "\nMethodPort cannot be resolved.");
     }
   }
   
@@ -73,13 +60,8 @@ public class ExampleComponents {
     
     @Override
     public List<Port> getPorts() {
-      try {
-        MethodHandle _bind = MethodHandles.lookup().bind(this, "readUserInput", MethodType.methodType(String.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
-      } catch (Throwable _e) {
-        throw Exceptions.sneakyThrow(_e);
-      }
+      throw new Error("Unresolved compilation problems:"
+        + "\nMethodPort cannot be resolved.");
     }
   }
   
@@ -106,13 +88,8 @@ public class ExampleComponents {
     
     @Override
     public List<Port> getPorts() {
-      try {
-        MethodHandle _bind = MethodHandles.lookup().bind(this, "display", MethodType.methodType(void.class, int.class));
-        MethodPort _methodPort = new MethodPort(this, _bind);
-        return Collections.<Port>unmodifiableList(CollectionLiterals.<Port>newArrayList(_methodPort));
-      } catch (Throwable _e) {
-        throw Exceptions.sneakyThrow(_e);
-      }
+      throw new Error("Unresolved compilation problems:"
+        + "\nMethodPort cannot be resolved.");
     }
   }
 }

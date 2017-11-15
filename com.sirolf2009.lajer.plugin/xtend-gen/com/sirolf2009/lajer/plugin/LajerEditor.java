@@ -343,7 +343,7 @@ public class LajerEditor extends EditorPart {
   
   @Override
   public boolean isDirty() {
-    return true;
+    return this.dirty;
   }
   
   @Override

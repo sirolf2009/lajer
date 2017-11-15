@@ -1,11 +1,11 @@
 package com.sirolf2009.lajer.core.splitter
 
-import com.sirolf2009.lajer.core.component.MethodPort
 import java.lang.invoke.MethodHandle
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Data
+import com.sirolf2009.lajer.core.component.FunctionPort
 
-@Data class SplitterPort extends MethodPort {
+@Data class SplitterPort extends FunctionPort {
 	
 	new(Splitter splitter, MethodHandle handle) {
 		super(splitter, handle.verifyReturn())

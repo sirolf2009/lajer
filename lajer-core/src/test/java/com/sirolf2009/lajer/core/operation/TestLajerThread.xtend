@@ -1,7 +1,6 @@
 package com.sirolf2009.lajer.core.operation
 
 import com.sirolf2009.lajer.core.component.Component
-import com.sirolf2009.lajer.core.component.MethodPort
 import com.sirolf2009.lajer.core.operation.model.Operation
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -9,6 +8,7 @@ import org.junit.Assert
 import org.junit.Test
 
 import static extension com.sirolf2009.lajer.core.operation.model.Connection.*
+import com.sirolf2009.lajer.core.component.FunctionPort
 
 class TestLajerThread {
 
@@ -151,7 +151,7 @@ class TestLajerThread {
 		}
 
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "doubler", MethodType.methodType(int, int)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "doubler", MethodType.methodType(int, int)))]
 		}
 
 	}
@@ -163,7 +163,7 @@ class TestLajerThread {
 		}
 
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "quadrupler", MethodType.methodType(int, int)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "quadrupler", MethodType.methodType(int, int)))]
 		}
 
 	}
@@ -177,7 +177,7 @@ class TestLajerThread {
 		}
 
 		override getPorts() {
-			return #[new MethodPort(this, MethodHandles.lookup.bind(this, "save", MethodType.methodType(void, int)))]
+			return #[new FunctionPort(this, MethodHandles.lookup.bind(this, "save", MethodType.methodType(void, int)))]
 		}
 
 	}

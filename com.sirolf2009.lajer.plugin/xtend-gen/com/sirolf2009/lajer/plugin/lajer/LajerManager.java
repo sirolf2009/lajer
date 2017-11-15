@@ -1,5 +1,6 @@
 package com.sirolf2009.lajer.plugin.lajer;
 
+import com.google.common.base.Objects;
 import com.sirolf2009.lajer.core.model.NodeModel;
 import com.sirolf2009.lajer.core.model.OperationModel;
 import com.sirolf2009.lajer.core.model.PortModel;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FigureListener;
@@ -166,6 +168,29 @@ public class LajerManager {
     return connection;
   }
   
+  public void unmarkAsInput(final InputFigure input) {
+    boolean _contains = this.inputPorts.contains(input);
+    if (_contains) {
+      this.inputPorts.remove(input);
+      final Function1<Object, Boolean> _function = (Object it) -> {
+        return Boolean.valueOf((it instanceof OriginConnectionFigure));
+      };
+      final Function1<Object, OriginConnectionFigure> _function_1 = (Object it) -> {
+        return ((OriginConnectionFigure) it);
+      };
+      final Function1<OriginConnectionFigure, Boolean> _function_2 = (OriginConnectionFigure it) -> {
+        PortFigure _to = it.getTo();
+        return Boolean.valueOf(Objects.equal(_to, input));
+      };
+      final Set<OriginConnectionFigure> toBeRemoved = IterableExtensions.<OriginConnectionFigure>toSet(IterableExtensions.<OriginConnectionFigure>filter(IterableExtensions.<Object, OriginConnectionFigure>map(IterableExtensions.<Object>filter(this.root.getChildren(), _function), _function_1), _function_2));
+      final Consumer<OriginConnectionFigure> _function_3 = (OriginConnectionFigure it) -> {
+        this.root.remove(it);
+        this.root.remove(it.getFrom());
+      };
+      toBeRemoved.forEach(_function_3);
+    }
+  }
+  
   public CallbackConnectionFigure markAsOutput(final OutputFigure output) {
     final OperationOutputFigure operationOutputFigure = new OperationOutputFigure();
     this.root.add(operationOutputFigure);
@@ -178,6 +203,29 @@ public class LajerManager {
     };
     output.addFigureListener(_function);
     return connection;
+  }
+  
+  public void unmarkAsOutput(final OutputFigure output) {
+    boolean _contains = this.outputPorts.contains(output);
+    if (_contains) {
+      this.outputPorts.remove(output);
+      final Function1<Object, Boolean> _function = (Object it) -> {
+        return Boolean.valueOf((it instanceof CallbackConnectionFigure));
+      };
+      final Function1<Object, CallbackConnectionFigure> _function_1 = (Object it) -> {
+        return ((CallbackConnectionFigure) it);
+      };
+      final Function1<CallbackConnectionFigure, Boolean> _function_2 = (CallbackConnectionFigure it) -> {
+        PortFigure _from = it.getFrom();
+        return Boolean.valueOf(Objects.equal(_from, output));
+      };
+      final Set<CallbackConnectionFigure> toBeRemoved = IterableExtensions.<CallbackConnectionFigure>toSet(IterableExtensions.<CallbackConnectionFigure>filter(IterableExtensions.<Object, CallbackConnectionFigure>map(IterableExtensions.<Object>filter(this.root.getChildren(), _function), _function_1), _function_2));
+      final Consumer<CallbackConnectionFigure> _function_3 = (CallbackConnectionFigure it) -> {
+        this.root.remove(it);
+        this.root.remove(it.getTo());
+      };
+      toBeRemoved.forEach(_function_3);
+    }
   }
   
   public void focusOnFirst() {

@@ -5,9 +5,15 @@ import com.sirolf2009.lajer.plugin.lajer.LajerManager
 import org.eclipse.draw2d.IFigure
 
 class LajerCommandRemoveSelected extends LajerCommand {
-
+	
 	override accept(extension LajerManager manager) {
 		if(focused !== null) {
+			focused.node.inputFigures.forEach[
+				unmarkAsInput(it)
+			]
+			focused.node.outputFigures.forEach[
+				unmarkAsOutput(it)
+			]
 			val incomingConnections = focused.node.inputFigures.flatMap [ input |
 				input.port.incomingConnections.map[it]
 			].toSet()
@@ -18,7 +24,7 @@ class LajerCommandRemoveSelected extends LajerCommand {
 			]
 			val outgoingConnections = focused.node.outputFigures.flatMap [ output |
 				output.port.outgoingConnections.map[it]
-			]
+			].toSet()
 			outgoingConnections.forEach [
 				manager.root.children.removeAll(manager.root.children.filter[it instanceof ConnectionFigure].map[it as ConnectionFigure].filter[it.input == input && it.output == output].toList())
 				from.outgoingConnections.remove(it)

@@ -90,6 +90,19 @@ class LajerManager {
 		return connection
 	}
 
+	def unmarkAsInput(InputFigure input) {
+		if(inputPorts.contains(input)) {
+			inputPorts.remove(input)
+			val toBeRemoved = root.children.filter[it instanceof OriginConnectionFigure].map[it as OriginConnectionFigure].filter [
+				it.to == input
+			].toSet()
+			toBeRemoved.forEach [
+				root.remove(it)
+				root.remove(from)
+			]
+		}
+	}
+
 	def markAsOutput(OutputFigure output) {
 		val operationOutputFigure = new OperationOutputFigure()
 		root.add(operationOutputFigure)
@@ -100,6 +113,19 @@ class LajerManager {
 			layout.setConstraint(operationOutputFigure, new Rectangle(output.bounds.center.x + 80, output.bounds.center.y - 10, -1, -1))
 		]
 		return connection
+	}
+	
+	def unmarkAsOutput(OutputFigure output) {
+		if(outputPorts.contains(output)) {
+				outputPorts.remove(output)
+				val toBeRemoved = root.children.filter[it instanceof CallbackConnectionFigure].map[it as CallbackConnectionFigure].filter [
+					it.from == output
+				].toSet()
+				toBeRemoved.forEach[
+					root.remove(it)
+					root.remove(to)
+				]
+			}
 	}
 
 	def focusOnFirst() {
